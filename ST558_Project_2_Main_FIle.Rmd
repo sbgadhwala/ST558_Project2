@@ -7,7 +7,7 @@ output: github_document
 
 # About the API 
  
- DONKI API # change for branchs
+ DONKI API # change for branch
 
 
 3.
