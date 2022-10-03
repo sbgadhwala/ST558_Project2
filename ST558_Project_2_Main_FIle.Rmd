@@ -1,0 +1,53 @@
+---
+title: "ST558 Project 2"
+author: "Shyam & Kamlesh"
+date: "9/28/2022"
+output: github_document
+---
+
+# About the API 
+ 
+ DONKI
+
+
+3.
+
+# Required library 
+
+Following packages are used for this project
+
+```{r, warning=FALSE, message=FALSE}
+library(httr)
+library(jsonlite)
+library(dplyr)
+
+```
+
+
+# The NASA API has 
+
+```{r}
+URL     <- 'https://api.nasa.gov/EPIC/api/natural/images'
+
+api.key <-  'Z42ast1lzFG4H5UE4FxRuYTVIrKPtYZqgoAzNM8A'
+
+# Accessing data from API
+res <- GET(paste(URL, api.key, sep = '?api_key='))
+
+str(res, max.level = 1)
+
+# converting into a data frame
+
+nasa.data <- fromJSON(rawToChar(res$content))
+
+# to know more about the structure of the datatset
+str(nasa.data, max.level = 1)
+
+names(nasa.data)
+```
+
+```{r}
+op <- as_tibble(nasa.data$coords)
+op$centroid_coordinates
+
+```
