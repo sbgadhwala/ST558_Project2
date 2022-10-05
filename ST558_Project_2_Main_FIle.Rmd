@@ -61,28 +61,4 @@ return (final.data$results)
 }
 
 data <- get.data('By.recepies', 'pasta')
-
-
-
-
-# 
-# # Accessing data from API
-# res <- GET(paste(URL, api.key, sep = '&apiKey='))
-# 
-# str(res, max.level = 1)
-# 
-# # converting into a data frame
-# 
-# food.data <- fromJSON(rawToChar(res$content))
-# 
-# # to know more about the structure of the datatset
-# str(food.data, max.level = 1)
-# 
-# names(nasa.data)
-```
-
-```{r}
-op <- as_tibble(nasa.data$coords)
-op$centroid_coordinates
-
 ```
