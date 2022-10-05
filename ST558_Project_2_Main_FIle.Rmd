@@ -5,16 +5,22 @@ date: "9/28/2022"
 output: github_document
 ---
 
-# About the API 
- 
- DONKI API
 
 
-3.
 
-# Required library 
 
-Following packages are used for this project
+
+# Required packages 
+
+# Functions for API
+
+# EDA
+
+# Summary
+
+
+# Required packages 
+
 
 ```{r, warning=FALSE, message=FALSE}
 library(httr)
@@ -23,27 +29,56 @@ library(dplyr)
 
 ```
 
+I am considering of 3 api with two modifications
 
-# The NASA API has 
+1. Search Recipe
+2. Search Recipe with Nutrients
+3. Search Recipe with Ingredients
+
+# 
 
 ```{r}
-URL     <- 'https://api.nasa.gov/EPIC/api/natural/images'
 
-api.key <-  'Z42ast1lzFG4H5UE4FxRuYTVIrKPtYZqgoAzNM8A'
+URL     <- 'https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&number=2'
 
-# Accessing data from API
-res <- GET(paste(URL, api.key, sep = '?api_key='))
+api.key <-  '1cbc662969264fce908100922bb50a6b'
 
-str(res, max.level = 1)
+search.option <- c('By.recepies', 'By.ingredients', 'By.nutrients')
 
-# converting into a data frame
+get.data <- function(endpoint, choices) {
+  URL <- 'https://api.spoonacular.com/recipes/complexSearch?query'
+  api.key = '1cbc662969264fce908100922bb50a6b'
+  if (endpoint == 'By.recepies') {
+    if (choices == 'pasta'){
+      temp <- paste(URL, choices, sep = '=')
+      res <- GET(paste(temp, api.key, sep = '&apiKey='))
+      final.data <- fromJSON(rawToChar(res$content))
+    }
+  }
+  
+return (final.data$results)
+  
+}
 
-nasa.data <- fromJSON(rawToChar(res$content))
+data <- get.data('By.recepies', 'pasta')
 
-# to know more about the structure of the datatset
-str(nasa.data, max.level = 1)
 
-names(nasa.data)
+
+
+# 
+# # Accessing data from API
+# res <- GET(paste(URL, api.key, sep = '&apiKey='))
+# 
+# str(res, max.level = 1)
+# 
+# # converting into a data frame
+# 
+# food.data <- fromJSON(rawToChar(res$content))
+# 
+# # to know more about the structure of the datatset
+# str(food.data, max.level = 1)
+# 
+# names(nasa.data)
 ```
 
 ```{r}
