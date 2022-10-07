@@ -1,7 +1,6 @@
 ST558 Project 2
 ================
 Shyam Gadhwala & Kamlesh Pandey
-9/28/2022
 
 ``` r
 library(httr)
