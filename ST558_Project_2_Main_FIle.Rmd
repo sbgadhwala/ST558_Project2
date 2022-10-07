@@ -27,6 +27,55 @@ library(dplyr)
 
 # The NASA API has 
 
+```{r cme, message=FALSE, warning=FALSE}
+
+cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0){
+  baseUrl <- 'https://api.nasa.gov/DONKI/'
+  apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
+  
+  targetUrl <- paste0(baseUrl, "CMEAnalysis?", "startDate=", startDate, 
+                      "&endDate=", endDate, "&speed=", speed,
+                      "&halfAngle=", halfAngle, "&api_key=", api_key)
+  
+  #TODO - if else checks for data types and everything, EDA
+  
+  jsonContent <- fromJSON(rawToChar(GET(targetUrl)$content))
+  
+  time <- jsonContent$time21_5
+  lat <- jsonContent$latitude
+  lon <- jsonContent$longitude
+  halfAngle_ <- jsonContent$halfAngle
+  speed_ <- jsonContent$speed
+  type <- jsonContent$type
+  
+  cmeDataTibble <- tibble(time = time, latitude = lat, longitude = lon, halfAngle = halfAngle_,speed = speed_, type = type)
+
+  
+  return(list(url = targetUrl, data = cmeDataTibble))
+}
+
+```
+
+
+```{r intial_selection, message=FALSE, warning=FALSE}
+apiSelection <- function(api, ...){
+  
+  if (tolower(api) == tolower("Coronal Mass Ejection (CME) Analysis")){
+    # call the cme function
+    cmeData(...)
+    
+  }
+  else if(tolower(api) == tolower("Interplanetary Shock (IPS)")){
+    # call the ips function
+    
+  }
+  else{
+    return("This api is not yet supported. Please select from either 'Coronal Mass Ejection (CME) Analysis' or 'Interplanetary Shock (IPS)'.")
+  }
+}
+
+```
+
 ```{r}
 URL     <- 'https://api.nasa.gov/DONKI/'
 
@@ -36,21 +85,13 @@ fillapi <- function(url, startEnd, endDate){
   return(paste0(url, "CME?", "startDate=", startEnd, "&endDate=", endDate, "&api_key=", api_key))
 }
 
-# Accessing data from API
-#res <- GET(url = paste(URL, api.key, sep = '?api_key='))
 res <- GET(fillapi(URL, "2019-01-01", "2021-01-01"))
 
-#print(str(res, max.level = 1))
 
-# converting into a data frame
 
 nasa.data <- fromJSON(rawToChar(res$content))
 
-# to know more about the structure of the datatset
-#print(str(nasa.data, max.level = 1))
 
-#print(nasa.data)
-#names(nasa.data)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -64,6 +105,5 @@ speed = c()
 for (i in 1:length(nasa.data$cmeAnalyses)){
   lat <- append(lat, nasa.data$cmeAnalyses[[i]]$latitude)
 }
-#op$centroid_coordinates
 
 ```
