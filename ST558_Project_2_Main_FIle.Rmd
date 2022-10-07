@@ -124,7 +124,7 @@ apiSelection <- function(api, ...){
     
   }
   else{
-    return("This api is not yet supported. Please select from either 'Coronal Mass Ejection (CME) Analysis' or 'Interplanetary Shock (IPS)'.")
+    return("This api is not yet supported. Please select from either 'Coronal Mass Ejection (CME) Analysis' or 'Interplanetary Shock (IPS)'")
   }
 }
 
