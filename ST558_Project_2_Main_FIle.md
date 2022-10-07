@@ -1,33 +1,28 @@
----
-title: "ST558 Project 2"
-author: "Shyam Gadhwala & Kamlesh Pandey"
-date: "9/28/2022"
-output: github_document
----
+ST558 Project 2
+================
+Shyam Gadhwala & Kamlesh Pandey
+9/28/2022
 
-# About the API 
- 
- DONKI
+# About the API
 
+DONKI
 
-3.
+3.  
 
-# Required library 
+# Required library
 
 Following packages are used for this project
 
-```{r, warning=FALSE, message=FALSE}
+``` r
 library(httr)
 library(tidyverse)
 library(jsonlite)
 library(dplyr)
-
 ```
 
+# The NASA API has
 
-# The NASA API has 
-
-```{r}
+``` r
 URL     <- 'https://api.nasa.gov/DONKI/'
 
 api_key <-  'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
@@ -53,9 +48,26 @@ nasa.data <- fromJSON(rawToChar(res$content))
 #names(nasa.data)
 ```
 
-```{r, warning=FALSE, message=FALSE}
-op <- as_tibble(matrix(nasa.data$cmeAnalyses[1,]))
+``` r
+op <- as_tibble(matrix(nasa.data$cmeAnalyses))
 op
-#op$centroid_coordinates
+```
 
+    ## # A tibble: 210 × 1
+    ##    V1           
+    ##    <list>       
+    ##  1 <df [1 × 11]>
+    ##  2 <df [1 × 11]>
+    ##  3 <df [1 × 11]>
+    ##  4 <df [1 × 11]>
+    ##  5 <df [2 × 11]>
+    ##  6 <df [2 × 11]>
+    ##  7 <df [3 × 11]>
+    ##  8 <df [1 × 11]>
+    ##  9 <df [1 × 11]>
+    ## 10 <df [1 × 11]>
+    ## # … with 200 more rows
+
+``` r
+#op$centroid_coordinates
 ```
