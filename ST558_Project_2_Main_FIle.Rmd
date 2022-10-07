@@ -25,45 +25,61 @@ library(dplyr)
 ```
 
 
-# The NASA API has 
 
-```{r}
-URL     <- 'https://api.nasa.gov/DONKI/'
+```{r irs, warning=FALSE, message=FALSE}
 
-api_key <-  'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
-
-fillapi <- function(url, startEnd, endDate){
-  return(paste0(url, "CME?", "startDate=", startEnd, "&endDate=", endDate, "&api_key=", api_key))
+asteroidData <- function(start_date, end_date){
+  baseURL <- 'https://api.nasa.gov/neo/rest/v1/'
+  apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
+  endpoint <- 'feed'
+  url <- paste0(baseURL, endpoint, '?startDate=', start_date, '&endDate=', end_date,'&api_key=', apiKey)
+  
+  res <- GET(url)
+  asteroidData <- fromJSON(rawToChar(res$content))
+  
+  ######### only seven days limit
+  magnitude <- c()
+  dMin  <- c()
+  dMax <- c()
+  velocity <- c()
+  Date <- c()
+  missDist <- c()
+  
+  for (i in 1:length(asteroidData$near_earth_objects)) {
+    absMag <- asteroidData$near_earth_objects[[i]]$absolute_magnitude_h
+    dMin_  <- asteroidData$near_earth_objects[[i]]$estimated_diameter$miles$estimated_diameter_min
+    dMax_ <- asteroidData$near_earth_objects[[i]]$estimated_diameter$miles$estimated_diameter_max
+    tempDate <- c()
+    tempVel <- c()
+    tempDist <- c()
+    
+     # for close approach
+    for (j in 1:length(asteroidData$near_earth_objects[[i]]$close_approach_data)){
+      vel <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$relative_velocity$miles_per_hour
+      tempVel <- append(tempVel, vel)
+      date <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$close_approach_date
+      tempDate <- append(tempDate, date)
+      dist <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$miss_distance$miles
+      tempDist <- append(tempDist, dist)
+    }
+    
+    missDist <- append(missDist, tempDist)
+    Date <- append(Date, tempDate)
+    velocity <-append(velocity, tempVel)
+    magnitude <- append(magnitude, absMag)
+    dMin <- append(dMin, dMin_)
+    dMax <- append(dMax, dMax_)
+    
+  }
+  aesData <- tibble(Magnitude = magnitude, Minimum_Diameter =dMin, Maximum_Diameter = dMax, Approach_Velocity = velocity, Approach_Date = Date, Miss_Distance = missDist)
+  
+return (list(url = url, data = aesData))
 }
+  
+z <- asteroidData(start_date = '1994-08-13', end_date = '1994-08-20')
 
-# Accessing data from API
-#res <- GET(url = paste(URL, api.key, sep = '?api_key='))
-res <- GET(fillapi(URL, "2019-01-01", "2021-01-01"))
-
-#print(str(res, max.level = 1))
-
-# converting into a data frame
-
-nasa.data <- fromJSON(rawToChar(res$content))
-
-# to know more about the structure of the datatset
-#print(str(nasa.data, max.level = 1))
-
-#print(nasa.data)
-#names(nasa.data)
-```
-
-```{r, warning=FALSE, message=FALSE}
-op <- as_tibble(matrix(nasa.data$cmeAnalyses))
-op
-
-lat = c()
-lon = c()
-hA = c()
-speed = c()
-for (i in 1:length(nasa.data$cmeAnalyses)){
-  lat <- append(lat, nasa.data$cmeAnalyses[[i]]$latitude)
-}
-#op$centroid_coordinates
+# 7 days limit checks 
+# end date chaecks
+# EDA
 
 ```
