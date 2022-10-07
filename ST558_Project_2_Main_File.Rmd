@@ -5,16 +5,7 @@ date: "9/28/2022"
 output: github_document
 ---
 
-# About the API 
- 
- DONKI
 
-
-3.
-
-# Required library 
-
-Following packages are used for this project
 
 ```{r, warning=FALSE, message=FALSE}
 library(httr)
