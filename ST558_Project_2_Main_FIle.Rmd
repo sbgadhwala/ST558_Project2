@@ -48,17 +48,15 @@ search.option <- c('By.recepies', 'By.ingredients', 'By.nutrients')
 get.data <- function(endpoint, choices) {
   URL <- 'https://api.spoonacular.com/recipes/complexSearch?query'
   api.key = '1cbc662969264fce908100922bb50a6b'
-  if (endpoint == 'By.recepies') {
-    if (choices == 'pasta'){
+  if (endpoint == 'By.recepies'){
       temp <- paste(URL, choices, sep = '=')
       res <- GET(paste(temp, api.key, sep = '&apiKey='))
       final.data <- fromJSON(rawToChar(res$content))
-    }
   }
   
 return (final.data$results)
   
 }
 
-data <- get.data('By.recepies', 'pasta')
+data <- get.data('By.recepies', 'indian')
 ```
