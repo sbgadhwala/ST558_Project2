@@ -5,16 +5,22 @@ date: "9/28/2022"
 output: github_document
 ---
 
-# About the API 
- 
- DONKI
 
 
-3.
 
-# Required library 
 
-Following packages are used for this project
+
+# Required packages 
+
+# Functions for API
+
+# EDA
+
+# Summary
+
+
+# Required packages 
+
 
 ```{r, warning=FALSE, message=FALSE}
 library(httr)
@@ -24,10 +30,16 @@ library(dplyr)
 
 ```
 
+I am considering of 3 api with two modifications
 
-# The NASA API has 
+1. Search Recipe
+2. Search Recipe with Nutrients
+3. Search Recipe with Ingredients
+
+# 
 
 ```{r}
+<<<<<<< HEAD
 URL     <- 'https://api.nasa.gov/DONKI/'
 
 api_key <-  'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
@@ -57,5 +69,27 @@ nasa.data <- fromJSON(rawToChar(res$content))
 op <- as_tibble(matrix(nasa.data$cmeAnalyses[1,]))
 op
 #op$centroid_coordinates
+=======
 
+URL     <- 'https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&number=2'
+
+api.key <-  '1cbc662969264fce908100922bb50a6b'
+
+search.option <- c('By.recepies', 'By.ingredients', 'By.nutrients')
+
+get.data <- function(endpoint, choices) {
+  URL <- 'https://api.spoonacular.com/recipes/complexSearch?query'
+  api.key = '1cbc662969264fce908100922bb50a6b'
+  if (endpoint == 'By.recepies'){
+      temp <- paste(URL, choices, sep = '=')
+      res <- GET(paste(temp, api.key, sep = '&apiKey='))
+      final.data <- fromJSON(rawToChar(res$content))
+  }
+  
+return (final.data$results)
+  
+}
+>>>>>>> 45837963d93b17fdab9756d7b633d87c204d03ee
+
+data <- get.data('By.recepies', 'indian')
 ```
