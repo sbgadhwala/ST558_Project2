@@ -26,6 +26,7 @@ library(dplyr)
 
 
 
+<<<<<<< HEAD
 ```{r irs, warning=FALSE, message=FALSE}
 
 asteroidData <- function(start_date, end_date){
@@ -74,12 +75,93 @@ asteroidData <- function(start_date, end_date){
   aesData <- tibble(Magnitude = magnitude, Minimum_Diameter =dMin, Maximum_Diameter = dMax, Approach_Velocity = velocity, Approach_Date = Date, Miss_Distance = missDist)
   
 return (list(url = url, data = aesData))
+=======
+```{r cme, message=FALSE, warning=FALSE}
+
+cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0){
+  baseUrl <- 'https://api.nasa.gov/DONKI/'
+  apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
+  
+  targetUrl <- paste0(baseUrl, "CMEAnalysis?", "startDate=", startDate, 
+                      "&endDate=", endDate, "&speed=", speed,
+                      "&halfAngle=", halfAngle, "&api_key=", api_key)
+  
+  #TODO - if else checks for data types and everything, EDA
+  
+  jsonContent <- fromJSON(rawToChar(GET(targetUrl)$content))
+  
+  time <- jsonContent$time21_5
+  lat <- jsonContent$latitude
+  lon <- jsonContent$longitude
+  halfAngle_ <- jsonContent$halfAngle
+  speed_ <- jsonContent$speed
+  type <- jsonContent$type
+  
+  cmeDataTibble <- tibble(time = time, latitude = lat, longitude = lon, halfAngle = halfAngle_,speed = speed_, type = type)
+
+  
+  return(list(url = targetUrl, data = cmeDataTibble))
+}
+
+```
+
+
+```{r intial_selection, message=FALSE, warning=FALSE}
+apiSelection <- function(api, ...){
+  
+  if (tolower(api) == tolower("Coronal Mass Ejection (CME) Analysis")){
+    # call the cme function
+    cmeData(...)
+    
+  }
+  else if(tolower(api) == tolower("Interplanetary Shock (IPS)")){
+    # call the ips function
+    
+  }
+  else{
+    return("This api is not yet supported. Please select from either 'Coronal Mass Ejection (CME) Analysis' or 'Interplanetary Shock (IPS)'.")
+  }
+}
+
+```
+
+```{r}
+URL     <- 'https://api.nasa.gov/DONKI/'
+
+api_key <-  'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
+
+fillapi <- function(url, startEnd, endDate){
+  return(paste0(url, "CME?", "startDate=", startEnd, "&endDate=", endDate, "&api_key=", api_key))
+>>>>>>> 7980535ae0370769e6c5466e5b5df6cba5cfbfd6
 }
   
 z <- asteroidData(start_date = '1994-08-13', end_date = '1994-08-20')
 
+<<<<<<< HEAD
 # 7 days limit checks 
 # end date chaecks
 # EDA
+=======
+res <- GET(fillapi(URL, "2019-01-01", "2021-01-01"))
+
+
+
+nasa.data <- fromJSON(rawToChar(res$content))
+
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+op <- as_tibble(matrix(nasa.data$cmeAnalyses))
+op
+
+lat = c()
+lon = c()
+hA = c()
+speed = c()
+for (i in 1:length(nasa.data$cmeAnalyses)){
+  lat <- append(lat, nasa.data$cmeAnalyses[[i]]$latitude)
+}
+>>>>>>> 7980535ae0370769e6c5466e5b5df6cba5cfbfd6
 
 ```
