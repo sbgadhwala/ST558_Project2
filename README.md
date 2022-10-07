@@ -3,16 +3,6 @@ ST558 Project 2
 Shyam Gadhwala & Kamlesh Pandey
 9/28/2022
 
-# About the API
-
-DONKI
-
-3.  
-
-# Required library
-
-Following packages are used for this project
-
 ``` r
 library(httr)
 library(tidyverse)
@@ -21,7 +11,7 @@ library(dplyr)
 ```
 
 ``` r
-asteroidData <- function(start_date, end_date){
+asteroidData <- function(start_date, end_date, ...){
   baseURL <- 'https://api.nasa.gov/neo/rest/v1/'
   apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
   endpoint <- 'feed'
@@ -71,7 +61,7 @@ return (list(url = url, data = aesData))
 ```
 
 ``` r
-cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0){
+cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
   baseUrl <- 'https://api.nasa.gov/DONKI/'
   apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
   
@@ -101,12 +91,11 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0){
 apiSelection <- function(api, ...){
   
   if (tolower(api) == tolower("Coronal Mass Ejection (CME) Analysis")){
-    # call the cme function
     cmeData(...)
     
   }
-  else if(tolower(api) == tolower("Interplanetary Shock (IPS)")){
-    # call the ips function
+  else if(tolower(api) == tolower("Asteroids - NeoWs")){
+    asteroidData(...)
     
   }
   else{
