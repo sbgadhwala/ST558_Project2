@@ -16,8 +16,6 @@ library(lubridate)
 ```
 
 
-
-
 ```{r irs, warning=FALSE, message=FALSE}
 
 asteroidData <- function(start_date, end_date, ...){
@@ -29,20 +27,33 @@ asteroidData <- function(start_date, end_date, ...){
   res <- GET(url)
   asteroidData <- fromJSON(rawToChar(res$content))
   
-  #check if end_date > start_date
-  if (ymd(end_date) < ymd(start_date)){
-    message <- paste('End date' , end_date, 'should be greater than the start date', start_date)
+  # check for date format
+  dateFormat <- "%Y-%m-%d"
+  
+  checkStart <- tryCatch(!is.na(as.Date(start_date, dateFormat)), 
+             error = function(err) 
+             {TRUE})
+  
+  checkEnd <- tryCatch(!is.na(as.Date(end_date, dateFormat)), 
+             error = function(err) 
+             {TRUE})
+  
+  # First Check for date format
+  if (checkStart == FALSE | checkEnd == FALSE){
+    message <- paste('[ERROR..!!] Either your start or end date is not is correct format YYYY-MM-DD!')
     print(message)
-    stop(message())
+    stop(message)
   }
-  
-  
-  
-  
-  
-  
-  print(difftime(start_date, end_date, units = "days"))
-  
+  else if(checkStart == TRUE & checkEnd == TRUE){
+    #check if end_date > start_date
+    if (ymd(end_date) < ymd(start_date)){
+      message <- paste('End date' , end_date, 'should be greater than the start date', start_date)
+      print(message)
+      stop(message())
+      
+      } else if (ymd(end_date) > ymd(start_date)){
+        
+  # API Parameters      
   magnitude <- c()
   dMin  <- c()
   dMax <- c()
@@ -58,7 +69,7 @@ asteroidData <- function(start_date, end_date, ...){
     tempVel <- c()
     tempDist <- c()
     
-     # for close approach
+    # for close approach
     for (j in 1:length(asteroidData$near_earth_objects[[i]]$close_approach_data)){
       vel <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$relative_velocity$miles_per_hour
       tempVel <- append(tempVel, vel)
@@ -75,6 +86,9 @@ asteroidData <- function(start_date, end_date, ...){
     dMin <- append(dMin, dMin_)
     dMax <- append(dMax, dMax_)
     
+  }
+  
+      }
   }
   aesData <- tibble(Magnitude = magnitude, Minimum_Diameter =dMin, Maximum_Diameter = dMax, Approach_Velocity = velocity, Approach_Date = Date, Miss_Distance = missDist)
   
