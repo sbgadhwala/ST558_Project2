@@ -72,7 +72,6 @@ return (list(url = url, data = aesData))
 
 
 
-
 ```{r cme, message=FALSE, warning=FALSE}
 
 cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
