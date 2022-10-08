@@ -124,14 +124,14 @@ asteroidData <- function(start_date, end_date, ...){
   
       }
   }
-  aesData <- tibble('Magnitude (H)' = magnitude, 
-                    'Minimum Diameter (Miles)' = dMin, 
-                    'Maximum Diameter (Miles)' = dMax, 
-                    'Relative Velocity (Kilometer per hour)' = velocity,
-                    'Approach Date' = Date, 
-                    'Miss Distance (au)' = missDist,
-                    'Orbiting Body' = orbitBody,
-                    'Is Potentially Hazardous Asteroid' = isHazard)
+  aesData <- tibble('Magnitude' = magnitude, 
+                    'Minimum_Diameter' = dMin, 
+                    'Maximum_Diameter' = dMax, 
+                    'Relative_Velocity' = velocity,
+                    'Approach_Date' = Date, 
+                    'Miss_Distance' = missDist,
+                    'Orbiting_Body' = orbitBody,
+                    'Is_Potentially_Hazardous_Asteroid' = isHazard)
   
 return (list(url = url, data = aesData))
   
@@ -144,8 +144,16 @@ data <- asteroidData('1994-10-10', '1994-12-10')$data
 ```{r}
 # EDA on Asteroid data
 
-data
+asteroidData <- data
 
+asteroidData
+# First round up to two values 
+
+
+plot1 <- ggplot(asteroidData, aes(x = Approach_Date, y = Miss_Distance))
+
+plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
+  theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())
 
 ```
 
