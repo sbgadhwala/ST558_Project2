@@ -11,6 +11,7 @@ library(httr)
 library(tidyverse)
 library(jsonlite)
 library(dplyr)
+library(lubridate)
 
 ```
 
@@ -28,7 +29,20 @@ asteroidData <- function(start_date, end_date, ...){
   res <- GET(url)
   asteroidData <- fromJSON(rawToChar(res$content))
   
-  ######### only seven days limit
+  #check if end_date > start_date
+  if (ymd(end_date) < ymd(start_date)){
+    message <- paste('End date' , end_date, 'should be greater than the start date', start_date)
+    print(message)
+    stop(message())
+  }
+  
+  
+  
+  
+  
+  
+  print(difftime(start_date, end_date, units = "days"))
+  
   magnitude <- c()
   dMin  <- c()
   dMax <- c()
