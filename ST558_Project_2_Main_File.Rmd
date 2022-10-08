@@ -1,7 +1,6 @@
 ---
 title: "ST558 Project 2"
 author: "Shyam Gadhwala & Kamlesh Pandey"
-date: "9/28/2022"
 output: github_document
 ---
 
