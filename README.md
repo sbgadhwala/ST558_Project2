@@ -7,6 +7,9 @@ library(httr)
 library(tidyverse)
 library(jsonlite)
 library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(jpeg)
 library(lubridate)
 ```
 
@@ -14,10 +17,10 @@ library(lubridate)
 
 NeoWs (Near Earth object Web Service) is a REST API for near earth
 Asteroid information. Near Earth Objects (NEOs) are comets and asteroids
-and due to the gravitational attraction of narby planet they enter into
+and due to the gravitational attraction of nearby planet they enter into
 earth gravitational orbit
 
-This API has near earth objects (NEO) tracking and the dataset has 99%
+This API has near earth objects (NEO) tracking and the data set has 99%
 asteroids and only 1% comet data.
 
 Parameter information:
@@ -148,26 +151,21 @@ asteroidData <- data
 asteroidData
 ```
 
-    ## # A tibble: 71 x 8
-    ##    Magnitude Minimum_Diameter
-    ##        <dbl>            <dbl>
-    ##  1      20.6           0.125 
-    ##  2      22.1           0.0628
-    ##  3      21.1           0.0995
-    ##  4      24.5           0.0208
-    ##  5      21             0.104 
-    ##  6      21.2           0.0950
-    ##  7      24.2           0.0234
-    ##  8      23             0.0415
-    ##  9      25.2           0.0148
-    ## 10      19.6           0.199 
-    ## # ... with 61 more rows, and
-    ## #   6 more variables:
-    ## #   Maximum_Diameter <dbl>,
-    ## #   Relative_Velocity <chr>,
-    ## #   Approach_Date <chr>,
-    ## #   Miss_Distance <chr>,
-    ## #   Orbiting_Body <chr>, ...
+    ## # A tibble: 71 × 8
+    ##    Magnitude Minimum_Diameter Maximum_Diameter Relative_Velocity Approach_Date Miss_Di…¹ Orbit…² Is_Po…³
+    ##        <dbl>            <dbl>            <dbl> <chr>             <chr>         <chr>     <chr>   <lgl>  
+    ##  1      20.6           0.125            0.280  58294.7763241986  2022-10-14    0.427481… Earth   TRUE   
+    ##  2      22.1           0.0628           0.140  104578.8548585512 2022-10-14    0.374871… Earth   FALSE  
+    ##  3      21.1           0.0995           0.223  85022.4092955509  2022-10-14    0.438846… Earth   FALSE  
+    ##  4      24.5           0.0208           0.0465 43495.8399718031  2022-10-14    0.015752… Earth   FALSE  
+    ##  5      21             0.104            0.233  67428.07044759    2022-10-14    0.260491… Earth   TRUE   
+    ##  6      21.2           0.0950           0.213  7036.8960810754   2022-10-14    0.286598… Earth   FALSE  
+    ##  7      24.2           0.0234           0.0524 68965.6224563723  2022-10-14    0.481416… Earth   FALSE  
+    ##  8      23             0.0415           0.0928 43343.5893564928  2022-10-14    0.143858… Earth   FALSE  
+    ##  9      25.2           0.0148           0.0331 31072.0941864462  2022-10-14    0.071466… Earth   FALSE  
+    ## 10      19.6           0.199            0.444  39910.6293348686  2022-10-15    0.269620… Earth   FALSE  
+    ## # … with 61 more rows, and abbreviated variable names ¹​Miss_Distance, ²​Orbiting_Body,
+    ## #   ³​Is_Potentially_Hazardous_Asteroid
 
 ``` r
 # First round up to two values 
@@ -179,7 +177,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
   theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 # boxplot for min and max diamter
@@ -190,7 +188,7 @@ plot2 +
   geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 plot3 <- ggplot(asteroidData, aes(y = Maximum_Diameter))
@@ -199,18 +197,43 @@ plot3 +
   geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
 
 ``` r
 cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
   baseUrl <- 'https://api.nasa.gov/DONKI/'
   apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
   
+  checkStart <- !is.na(parse_date_time(startDate, orders = "ymd"))
+  if(!checkStart){
+    errorMessage <- "Please enter the Start Date in the YYYY-mm-dd format and try again."
+    stop(errorMessage)
+  }
+  
+  checkEnd <- !is.na(parse_date_time(endDate, orders = "ymd"))
+  if(!checkEnd){
+    errorMessage <- "Please enter the End Date in the YYYY-mm-dd format and try again."
+    stop(errorMessage)
+  }
+  
+  if (as.Date(startDate) > as.Date(endDate)){
+    errorMessage <- "The start date cannot be after the end date. Please enter the dates again."
+    stop(errorMessage)
+  }
+  
+  if (speed < 0){
+    paste0("Warning: ", "The speed cannot be negative. Proceeding with its default value of 0.")
+    speed = 0
+  }
+  
+  if (halfAngle < 0){
+    paste0("Warning: ", "The half angle cannot be negative. Proceeding with its default value of 0.")
+    halfAngle = 0
+  }
+  
   targetUrl <- paste0(baseUrl, "CMEAnalysis?", "startDate=", startDate, 
                       "&endDate=", endDate, "&speed=", speed,
-                      "&halfAngle=", halfAngle, "&api_key=", api_key)
-  
-  #TODO - if else checks for data types and everything, EDA
+                      "&halfAngle=", halfAngle, "&api_key=", apiKey)
   
   jsonContent <- fromJSON(rawToChar(GET(targetUrl)$content))
   
@@ -229,6 +252,22 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 ```
 
 ``` r
+cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
+
+img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+
+ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
+    background_image(img) +
+    geom_point(aes(color = as.factor(type), size = speed)) +
+    #scale_color_discrete(name = "Type") +
+    scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
+    ylim(-150,150) +
+    xlim(-30, 30)
+```
+
+![](README_files/figure-gfm/eda_cme-1.png)<!-- -->
+
+``` r
 apiSelection <- function(api, ...){
   
   if (tolower(api) == tolower("Coronal Mass Ejection (CME) Analysis")){
@@ -240,7 +279,7 @@ apiSelection <- function(api, ...){
     
   }
   else{
-    return("This api is not yet supported. Please select from either 'Coronal Mass Ejection (CME) Analysis' or 'Interplanetary Shock (IPS)'.")
+    return("This api is not yet supported. Please select from either 'Coronal Mass Ejection (CME) Analysis' or 'Asteroid (AST)'.")
   }
 }
 ```
