@@ -141,7 +141,7 @@ data <- asteroidData('1994-10-10', '1994-12-10')$data
 ```
 
 
-```{r}
+```{r, fig.width= 8, fig.height=6}
 # EDA on Asteroid data
 
 asteroidData <- data
@@ -157,7 +157,20 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
 
 ```
 
+```{r}
+# boxplot for min and max diamter
+par(mfrow = c(1,2))
+plot2 <- ggplot(asteroidData, aes(y = Minimum_Diameter))
 
+plot2 + 
+  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+
+plot3 <- ggplot(asteroidData, aes(y = Maximum_Diameter))
+
+plot3 + 
+  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+
+```
 
 
 
