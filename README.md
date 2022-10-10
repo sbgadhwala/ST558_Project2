@@ -152,20 +152,24 @@ asteroidData
 ```
 
     ## # A tibble: 71 × 8
-    ##    Magnitude Minimum_Diameter Maximum_Diameter Relative_Velocity Approach_Date Miss_Di…¹ Orbit…² Is_Po…³
-    ##        <dbl>            <dbl>            <dbl> <chr>             <chr>         <chr>     <chr>   <lgl>  
-    ##  1      20.6           0.125            0.280  58294.7763241986  2022-10-14    0.427481… Earth   TRUE   
-    ##  2      22.1           0.0628           0.140  104578.8548585512 2022-10-14    0.374871… Earth   FALSE  
-    ##  3      21.1           0.0995           0.223  85022.4092955509  2022-10-14    0.438846… Earth   FALSE  
-    ##  4      24.5           0.0208           0.0465 43495.8399718031  2022-10-14    0.015752… Earth   FALSE  
-    ##  5      21             0.104            0.233  67428.07044759    2022-10-14    0.260491… Earth   TRUE   
-    ##  6      21.2           0.0950           0.213  7036.8960810754   2022-10-14    0.286598… Earth   FALSE  
-    ##  7      24.2           0.0234           0.0524 68965.6224563723  2022-10-14    0.481416… Earth   FALSE  
-    ##  8      23             0.0415           0.0928 43343.5893564928  2022-10-14    0.143858… Earth   FALSE  
-    ##  9      25.2           0.0148           0.0331 31072.0941864462  2022-10-14    0.071466… Earth   FALSE  
-    ## 10      19.6           0.199            0.444  39910.6293348686  2022-10-15    0.269620… Earth   FALSE  
-    ## # … with 61 more rows, and abbreviated variable names ¹​Miss_Distance, ²​Orbiting_Body,
-    ## #   ³​Is_Potentially_Hazardous_Asteroid
+    ##    Magnitude Minimum_…¹ Maxim…² Relat…³ Appro…⁴ Miss_…⁵
+    ##        <dbl>      <dbl>   <dbl> <chr>   <chr>   <chr>  
+    ##  1      20.6     0.125   0.280  58294.… 2022-1… 0.4274…
+    ##  2      22.1     0.0628  0.140  104578… 2022-1… 0.3748…
+    ##  3      21.1     0.0995  0.223  85022.… 2022-1… 0.4388…
+    ##  4      24.5     0.0208  0.0465 43495.… 2022-1… 0.0157…
+    ##  5      21       0.104   0.233  67428.… 2022-1… 0.2604…
+    ##  6      21.2     0.0950  0.213  7036.8… 2022-1… 0.2865…
+    ##  7      24.2     0.0234  0.0524 68965.… 2022-1… 0.4814…
+    ##  8      23       0.0415  0.0928 43343.… 2022-1… 0.1438…
+    ##  9      25.2     0.0148  0.0331 31072.… 2022-1… 0.0714…
+    ## 10      19.6     0.199   0.444  39910.… 2022-1… 0.2696…
+    ## # … with 61 more rows, 2 more variables:
+    ## #   Orbiting_Body <chr>,
+    ## #   Is_Potentially_Hazardous_Asteroid <lgl>, and
+    ## #   abbreviated variable names ¹​Minimum_Diameter,
+    ## #   ²​Maximum_Diameter, ³​Relative_Velocity,
+    ## #   ⁴​Approach_Date, ⁵​Miss_Distance
 
 ``` r
 # First round up to two values 
@@ -177,7 +181,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
   theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 # boxplot for min and max diamter
@@ -188,7 +192,7 @@ plot2 +
   geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 plot3 <- ggplot(asteroidData, aes(y = Maximum_Diameter))
@@ -197,7 +201,7 @@ plot3 +
   geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
 
 ``` r
 cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
@@ -254,6 +258,18 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 ``` r
 cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
 
+summary(cmeSampleData %>% select(halfAngle, speed))
+```
+
+    ##    halfAngle         speed      
+    ##  Min.   : 5.00   Min.   :120.0  
+    ##  1st Qu.:12.00   1st Qu.:222.0  
+    ##  Median :18.00   Median :277.0  
+    ##  Mean   :18.12   Mean   :291.8  
+    ##  3rd Qu.:24.00   3rd Qu.:348.0  
+    ##  Max.   :33.00   Max.   :549.0
+
+``` r
 img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
@@ -265,7 +281,140 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     xlim(-30, 30)
 ```
 
-![](README_files/figure-gfm/eda_cme-1.png)<!-- -->
+![](README_files/figure-gfm/inital_plot-1.png)<!-- -->
+
+``` r
+cmeSampleData$type <- as.factor(cmeSampleData$type)
+
+speedClassfication <- c("Slow paced", "Medium Paced", "Fast Paced", "Hyper Paced")
+
+cmeSampleData <- cmeSampleData %>% 
+  mutate(speedC = as.factor(if_else(speed < 200, speedClassfication[1],
+                                            if_else(speed < 350,  speedClassfication[2],
+                                                    if_else(speed < 500, speedClassfication[3], speedClassfication[4])))))
+
+
+zones <- c("North-East", "North-West", "South-East", "South-West")
+
+cmeSampleData <- cmeSampleData %>%
+  mutate(zone = as.factor(if_else(latitude>=0 & longitude>=0, zones[1],
+                        if_else(latitude<=0 & longitude>=0,zones[2],
+                                if_else(latitude<=0 & longitude<=0, zones[4],
+                                        if_else(latitude>=0 & longitude<=0, zones[3], "Error"))))))
+
+cmeSampleData
+```
+
+    ## # A tibble: 97 × 8
+    ##    time      latit…¹ longi…² halfA…³ speed type  speedC
+    ##    <chr>       <dbl>   <dbl>   <dbl> <dbl> <fct> <fct> 
+    ##  1 2019-11-…       9      33      12   383 S     Fast …
+    ##  2 2019-11-…       7     -90       5   224 S     Mediu…
+    ##  3 2019-12-…      -2     -91       8   259 S     Mediu…
+    ##  4 2019-12-…      -1     -85      12   356 S     Fast …
+    ##  5 2019-12-…      -4     -88      10   211 S     Mediu…
+    ##  6 2019-12-…     -11     152      20   163 S     Slow …
+    ##  7 2020-01-…      -2       9      19   227 S     Mediu…
+    ##  8 2020-01-…      -5      12       6   205 S     Mediu…
+    ##  9 2020-01-…       5    -115      17   193 S     Slow …
+    ## 10 2020-01-…       2     -17      10   362 S     Fast …
+    ## # … with 87 more rows, 1 more variable: zone <fct>,
+    ## #   and abbreviated variable names ¹​latitude,
+    ## #   ²​longitude, ³​halfAngle
+
+``` r
+cmeSampleData %>%
+  group_by(zone, speedC, type) %>%
+  summarize(avgSpeed = mean(speed), sdSpeed = sd(speed), avgHalfAngle = mean(halfAngle), sdHalfAngle = sd(halfAngle), count = n()) %>%
+  arrange(zone, speedC)
+```
+
+    ## # A tibble: 12 × 8
+    ## # Groups:   zone, speedC [12]
+    ##    zone    speedC type  avgSp…¹ sdSpeed avgHa…² sdHal…³
+    ##    <fct>   <fct>  <fct>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 North-… Fast … S        368.   20.5     17.2    7.42
+    ##  2 North-… Mediu… S        261.   41.4     17.6    6.94
+    ##  3 North-… Slow … S        148.   21.7     16.6    8.30
+    ##  4 North-… Fast … S        401    30.1     19.5    8.39
+    ##  5 North-… Mediu… S        263.   36.8     16.4    6.93
+    ##  6 North-… Slow … S        151.   23.0     20.8    4.71
+    ##  7 South-… Fast … S        428    51.5     18.5    9.46
+    ##  8 South-… Mediu… S        275.   46.7     17.3    6.57
+    ##  9 South-… Slow … S        190.    3.65    24.8    6.61
+    ## 10 South-… Fast … S        410.   39.9     18.2   10.2 
+    ## 11 South-… Hyper… C        534.   19.6     21      8.83
+    ## 12 South-… Mediu… S        263.   41.6     17.2    6.34
+    ## # … with 1 more variable: count <int>, and abbreviated
+    ## #   variable names ¹​avgSpeed, ²​avgHalfAngle,
+    ## #   ³​sdHalfAngle
+
+``` r
+print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
+```
+
+    ## , ,  = C
+    ## 
+    ##             
+    ##              Fast Paced Hyper Paced Medium Paced
+    ##   North-East          0           0            0
+    ##   North-West          0           0            0
+    ##   South-East          0           0            0
+    ##   South-West          0           4            0
+    ##             
+    ##              Slow paced
+    ##   North-East          0
+    ##   North-West          0
+    ##   South-East          0
+    ##   South-West          0
+    ## 
+    ## , ,  = S
+    ## 
+    ##             
+    ##              Fast Paced Hyper Paced Medium Paced
+    ##   North-East          2           0           14
+    ##   North-West          4           0           16
+    ##   South-East          6           0           16
+    ##   South-West          8           0           13
+    ##             
+    ##              Slow paced
+    ##   North-East          4
+    ##   North-West          5
+    ##   South-East          5
+    ##   South-West          0
+
+``` r
+img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+
+ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
+    background_image(img) +
+    geom_point(aes(color = zone, size = speedC, shape = type)) +
+    #scale_shape_discrete(name = "Type", labels = c("S", "C")) +
+    #scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
+    scale_size_discrete(name = "speed", labels = c("slow", "medium", "fast", "hyper")) + 
+    ylim(-150,150) +
+    xlim(-30, 30) +
+  
+    annotate(geom="text", x=20, y=100, label=paste0("North-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[1])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[1]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[1]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=-20, y=100, label=paste0("North-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[2])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[2]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[2]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=-20, y=-100, label=paste0("South-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[4])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[4]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[4]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=20, y=-100, label=paste0("South-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[3])), "\navgSpeed : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$speed), 2),
+                                                  "\navgHalfAngle : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$halfAngle), 2)),
+              color="White", size=4) +
+  labs(title="Plot showing zone-wise Corona Mass Ejection statistics",
+        x ="Latitude", y = "Longitude")
+```
+
+![](README_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
 
 ``` r
 apiSelection <- function(api, ...){
