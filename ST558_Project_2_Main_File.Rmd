@@ -241,7 +241,7 @@ img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
     geom_point(aes(color = as.factor(type), size = speed)) +
-    scale_color_discrete(name = "Type") +
+    #scale_color_discrete(name = "Type") +
     scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
     ylim(-150,150) +
     xlim(-30, 30)
