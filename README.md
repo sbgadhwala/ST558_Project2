@@ -148,22 +148,26 @@ asteroidData <- data
 asteroidData
 ```
 
-    ## # A tibble: 77 x 8
-    ##    Magnitude Minimum_Diameter Maximum_Diameter Relative_Velocity
-    ##        <dbl>            <dbl>            <dbl> <chr>            
-    ##  1      20.6           0.125            0.280  58294.7763241986 
-    ##  2      22.1           0.0628           0.140  104578.8548585512
-    ##  3      21.1           0.0995           0.223  85022.4092955509 
-    ##  4      24.5           0.0208           0.0465 43495.8399718031 
-    ##  5      21             0.104            0.233  67428.07044759   
-    ##  6      21.2           0.0950           0.213  7036.8960810754  
-    ##  7      24.2           0.0234           0.0524 68965.6224563723 
-    ##  8      23             0.0415           0.0928 43343.5893564928 
-    ##  9      25.2           0.0148           0.0331 31072.0941864462 
-    ## 10      19.6           0.199            0.444  39910.6293348686 
-    ## # ... with 67 more rows, and 4 more variables: Approach_Date <chr>,
-    ## #   Miss_Distance <chr>, Orbiting_Body <chr>,
-    ## #   Is_Potentially_Hazardous_Asteroid <lgl>
+    ## # A tibble: 71 x 8
+    ##    Magnitude Minimum_Diameter
+    ##        <dbl>            <dbl>
+    ##  1      20.6           0.125 
+    ##  2      22.1           0.0628
+    ##  3      21.1           0.0995
+    ##  4      24.5           0.0208
+    ##  5      21             0.104 
+    ##  6      21.2           0.0950
+    ##  7      24.2           0.0234
+    ##  8      23             0.0415
+    ##  9      25.2           0.0148
+    ## 10      19.6           0.199 
+    ## # ... with 61 more rows, and
+    ## #   6 more variables:
+    ## #   Maximum_Diameter <dbl>,
+    ## #   Relative_Velocity <chr>,
+    ## #   Approach_Date <chr>,
+    ## #   Miss_Distance <chr>,
+    ## #   Orbiting_Body <chr>, ...
 
 ``` r
 # First round up to two values 
@@ -175,7 +179,27 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
   theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+# boxplot for min and max diamter
+par(mfrow = c(1,2))
+plot2 <- ggplot(asteroidData, aes(y = Minimum_Diameter))
+
+plot2 + 
+  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+plot3 <- ggplot(asteroidData, aes(y = Maximum_Diameter))
+
+plot3 + 
+  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
 
 ``` r
 cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
