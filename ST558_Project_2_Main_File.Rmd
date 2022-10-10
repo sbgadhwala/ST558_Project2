@@ -236,6 +236,11 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 ```{r eda_cme, message=FALSE, warning=FALSE}
 cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
 
+summary(cmeSampleData %>% select(halfAngle, speed))
+```
+
+
+```{r inital_plot, warning=FALSE, message=FALSE}
 img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
@@ -250,6 +255,75 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
 
 
 ```
+
+
+```{r categorizeData, warning=FALSE, message=FALSE}
+cmeSampleData$type <- as.factor(cmeSampleData$type)
+
+speedClassfication <- c("Slow paced", "Medium Paced", "Fast Paced", "Hyper Paced")
+
+cmeSampleData <- cmeSampleData %>% 
+  mutate(speedC = as.factor(if_else(speed < 200, speedClassfication[1],
+                                            if_else(speed < 350,  speedClassfication[2],
+                                                    if_else(speed < 500, speedClassfication[3], speedClassfication[4])))))
+
+
+zones <- c("North-East", "North-West", "South-East", "South-West")
+
+cmeSampleData <- cmeSampleData %>%
+  mutate(zone = as.factor(if_else(latitude>=0 & longitude>=0, zones[1],
+                        if_else(latitude<=0 & longitude>=0,zones[2],
+                                if_else(latitude<=0 & longitude<=0, zones[4],
+                                        if_else(latitude>=0 & longitude<=0, zones[3], "Error"))))))
+
+cmeSampleData
+```
+
+```{r summarize_cfs, message=FALSE, warning=FALSE}
+
+cmeSampleData %>%
+  group_by(zone, speedC, type) %>%
+  summarize(avgSpeed = mean(speed), sdSpeed = sd(speed), avgHalfAngle = mean(halfAngle), sdHalfAngle = sd(halfAngle), count = n()) %>%
+  arrange(zone, speedC)
+
+```
+
+```{r cme_con_tbls, message=FALSE, warning=FALSE}
+
+print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
+
+img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+
+ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
+    background_image(img) +
+    geom_point(aes(color = zone, size = speedC, shape = type)) +
+    #scale_shape_discrete(name = "Type", labels = c("S", "C")) +
+    #scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
+    scale_size_discrete(name = "speed", labels = c("slow", "medium", "fast", "hyper")) + 
+    ylim(-150,150) +
+    xlim(-30, 30) +
+  
+    annotate(geom="text", x=20, y=100, label=paste0("North-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[1])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[1]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[1]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=-20, y=100, label=paste0("North-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[2])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[2]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[2]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=-20, y=-100, label=paste0("South-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[4])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[4]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[4]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=20, y=-100, label=paste0("South-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[3])), "\navgSpeed : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$speed), 2),
+                                                  "\navgHalfAngle : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$halfAngle), 2)),
+              color="White", size=4) +
+  labs(title="Plot showing zone-wise Corona Mass Ejection statistics",
+        x ="Latitude", y = "Longitude")
+
+```
+
+
 
 ```{r intial_selection, message=FALSE, warning=FALSE}
 apiSelection <- function(api, ...){

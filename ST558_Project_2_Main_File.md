@@ -8,6 +8,8 @@ library(tidyverse)
 library(jsonlite)
 library(dplyr)
 library(ggplot2)
+library(ggpubr)
+library(jpeg)
 library(lubridate)
 ```
 
@@ -179,6 +181,26 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
 ![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
+# boxplot for min and max diamter
+par(mfrow = c(1,2))
+plot2 <- ggplot(asteroidData, aes(y = Minimum_Diameter))
+
+plot2 + 
+  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+```
+
+![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+plot3 <- ggplot(asteroidData, aes(y = Maximum_Diameter))
+
+plot3 + 
+  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+```
+
+![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+
+``` r
 cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
   baseUrl <- 'https://api.nasa.gov/DONKI/'
   apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
@@ -233,22 +255,146 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 ``` r
 cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
 
-ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
-  geom_point(aes(color = as.factor(type), size = speed)) +
-  scale_color_discrete(name = "Type") +
-  theme_classic() +
-  theme(panel.background = element_rect(fill = '#cfc340', colour = '#000000'))
+summary(cmeSampleData %>% select(halfAngle, speed))
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/eda_cme-1.png)<!-- -->
+    ##    halfAngle         speed      
+    ##  Min.   : 5.00   Min.   :120.0  
+    ##  1st Qu.:12.00   1st Qu.:222.0  
+    ##  Median :18.00   Median :277.0  
+    ##  Mean   :18.12   Mean   :291.8  
+    ##  3rd Qu.:24.00   3rd Qu.:348.0  
+    ##  Max.   :33.00   Max.   :549.0
 
 ``` r
+img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
-  geom_point(aes(color = as.factor(type), size = halfAngle)) +
-  scale_color_discrete(name = "Type")
+    background_image(img) +
+    geom_point(aes(color = as.factor(type), size = speed)) +
+    #scale_color_discrete(name = "Type") +
+    scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
+    ylim(-150,150) +
+    xlim(-30, 30)
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/eda_cme-2.png)<!-- -->
+![](ST558_Project_2_Main_FIle_files/figure-gfm/inital_plot-1.png)<!-- -->
+
+``` r
+cmeSampleData$type <- as.factor(cmeSampleData$type)
+
+speedClassfication <- c("Slow paced", "Medium Paced", "Fast Paced", "Hyper Paced")
+
+cmeSampleData <- cmeSampleData %>% 
+  mutate(speedC = as.factor(if_else(speed < 200, speedClassfication[1],
+                                            if_else(speed < 350,  speedClassfication[2],
+                                                    if_else(speed < 500, speedClassfication[3], speedClassfication[4])))))
+
+
+zones <- c("North-East", "North-West", "South-East", "South-West")
+
+cmeSampleData <- cmeSampleData %>%
+  mutate(zone = as.factor(if_else(latitude>=0 & longitude>=0, zones[1],
+                        if_else(latitude<=0 & longitude>=0,zones[2],
+                                if_else(latitude<=0 & longitude<=0, zones[4],
+                                        if_else(latitude>=0 & longitude<=0, zones[3], "Error"))))))
+
+cmeSampleData
+```
+
+    ## # A tibble: 97 × 8
+    ##    time              latitude longitude halfAngle speed type  speedC       zone 
+    ##    <chr>                <dbl>     <dbl>     <dbl> <dbl> <fct> <fct>        <fct>
+    ##  1 2019-11-21T01:10Z        9        33        12   383 S     Fast Paced   Nort…
+    ##  2 2019-11-28T09:11Z        7       -90         5   224 S     Medium Paced Sout…
+    ##  3 2019-12-04T11:03Z       -2       -91         8   259 S     Medium Paced Sout…
+    ##  4 2019-12-06T17:45Z       -1       -85        12   356 S     Fast Paced   Sout…
+    ##  5 2019-12-12T23:13Z       -4       -88        10   211 S     Medium Paced Sout…
+    ##  6 2019-12-31T00:59Z      -11       152        20   163 S     Slow paced   Nort…
+    ##  7 2020-01-06T16:13Z       -2         9        19   227 S     Medium Paced Nort…
+    ##  8 2020-01-15T03:44Z       -5        12         6   205 S     Medium Paced Nort…
+    ##  9 2020-01-19T23:11Z        5      -115        17   193 S     Slow paced   Sout…
+    ## 10 2020-01-26T04:27Z        2       -17        10   362 S     Fast Paced   Sout…
+    ## # … with 87 more rows
+
+``` r
+cmeSampleData %>%
+  group_by(zone, speedC, type) %>%
+  summarize(avgSpeed = mean(speed), sdSpeed = sd(speed), avgHalfAngle = mean(halfAngle), sdHalfAngle = sd(halfAngle), count = n()) %>%
+  arrange(zone, speedC)
+```
+
+    ## # A tibble: 12 × 8
+    ## # Groups:   zone, speedC [12]
+    ##    zone       speedC       type  avgSpeed sdSpeed avgHalfAngle sdHalfAngle count
+    ##    <fct>      <fct>        <fct>    <dbl>   <dbl>        <dbl>       <dbl> <int>
+    ##  1 North-East Fast Paced   S         368.   20.5          17.2        7.42     2
+    ##  2 North-East Medium Paced S         261.   41.4          17.6        6.94    14
+    ##  3 North-East Slow paced   S         148.   21.7          16.6        8.30     4
+    ##  4 North-West Fast Paced   S         401    30.1          19.5        8.39     4
+    ##  5 North-West Medium Paced S         263.   36.8          16.4        6.93    16
+    ##  6 North-West Slow paced   S         151.   23.0          20.8        4.71     5
+    ##  7 South-East Fast Paced   S         428    51.5          18.5        9.46     6
+    ##  8 South-East Medium Paced S         275.   46.7          17.3        6.57    16
+    ##  9 South-East Slow paced   S         190.    3.65         24.8        6.61     5
+    ## 10 South-West Fast Paced   S         410.   39.9          18.2       10.2      8
+    ## 11 South-West Hyper Paced  C         534.   19.6          21          8.83     4
+    ## 12 South-West Medium Paced S         263.   41.6          17.2        6.34    13
+
+``` r
+print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
+```
+
+    ## , ,  = C
+    ## 
+    ##             
+    ##              Fast Paced Hyper Paced Medium Paced Slow paced
+    ##   North-East          0           0            0          0
+    ##   North-West          0           0            0          0
+    ##   South-East          0           0            0          0
+    ##   South-West          0           4            0          0
+    ## 
+    ## , ,  = S
+    ## 
+    ##             
+    ##              Fast Paced Hyper Paced Medium Paced Slow paced
+    ##   North-East          2           0           14          4
+    ##   North-West          4           0           16          5
+    ##   South-East          6           0           16          5
+    ##   South-West          8           0           13          0
+
+``` r
+img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+
+ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
+    background_image(img) +
+    geom_point(aes(color = zone, size = speedC, shape = type)) +
+    #scale_shape_discrete(name = "Type", labels = c("S", "C")) +
+    #scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
+    scale_size_discrete(name = "speed", labels = c("slow", "medium", "fast", "hyper")) + 
+    ylim(-150,150) +
+    xlim(-30, 30) +
+  
+    annotate(geom="text", x=20, y=100, label=paste0("North-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[1])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[1]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[1]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=-20, y=100, label=paste0("North-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[2])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[2]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[2]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=-20, y=-100, label=paste0("South-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[4])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[4]))$speed),
+                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[4]))$halfAngle)),
+              color="White", size=4) + 
+  
+  annotate(geom="text", x=20, y=-100, label=paste0("South-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[3])), "\navgSpeed : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$speed), 2),
+                                                  "\navgHalfAngle : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$halfAngle), 2)),
+              color="White", size=4) +
+  labs(title="Plot showing zone-wise Corona Mass Ejection statistics",
+        x ="Latitude", y = "Longitude")
+```
+
+![](ST558_Project_2_Main_FIle_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
 
 ``` r
 apiSelection <- function(api, ...){
