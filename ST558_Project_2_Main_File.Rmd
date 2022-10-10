@@ -11,15 +11,18 @@ library(httr)
 library(tidyverse)
 library(jsonlite)
 library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(jpeg)
 library(lubridate)
 
 ```
 
 # Asteroid - NeoWs API
 
-NeoWs (Near Earth object Web Service) is a REST API for near earth Asteroid information. Near Earth Objects (NEOs) are comets and asteroids and due to the gravitational attraction of narby planet they enter into earth gravitational orbit
+NeoWs (Near Earth object Web Service) is a REST API for near earth Asteroid information. Near Earth Objects (NEOs) are comets and asteroids and due to the gravitational attraction of nearby planet they enter into earth gravitational orbit
 
-This API has near earth objects (NEO) tracking and the dataset has 99% asteroids and only 1% comet data. 
+This API has near earth objects (NEO) tracking and the data set has 99% asteroids and only 1% comet data. 
 
 Parameter information:
 
@@ -161,44 +164,42 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r cme, message=FALSE, warning=FALSE}
 
 cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
   baseUrl <- 'https://api.nasa.gov/DONKI/'
   apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
   
+  checkStart <- !is.na(parse_date_time(startDate, orders = "ymd"))
+  if(!checkStart){
+    errorMessage <- "Please enter the Start Date in the YYYY-mm-dd format and try again."
+    stop(errorMessage)
+  }
+  
+  checkEnd <- !is.na(parse_date_time(endDate, orders = "ymd"))
+  if(!checkEnd){
+    errorMessage <- "Please enter the End Date in the YYYY-mm-dd format and try again."
+    stop(errorMessage)
+  }
+  
+  if (as.Date(startDate) > as.Date(endDate)){
+    errorMessage <- "The start date cannot be after the end date. Please enter the dates again."
+    stop(errorMessage)
+  }
+  
+  if (speed < 0){
+    paste0("Warning: ", "The speed cannot be negative. Proceeding with its default value of 0.")
+    speed = 0
+  }
+  
+  if (halfAngle < 0){
+    paste0("Warning: ", "The half angle cannot be negative. Proceeding with its default value of 0.")
+    halfAngle = 0
+  }
+  
   targetUrl <- paste0(baseUrl, "CMEAnalysis?", "startDate=", startDate, 
                       "&endDate=", endDate, "&speed=", speed,
-                      "&halfAngle=", halfAngle, "&api_key=", api_key)
-  
-  #TODO - if else checks for data types and everything, EDA
+                      "&halfAngle=", halfAngle, "&api_key=", apiKey)
   
   jsonContent <- fromJSON(rawToChar(GET(targetUrl)$content))
   
@@ -218,6 +219,25 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 ```
 
 
+
+```{r eda_cme, message=FALSE, warning=FALSE}
+cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
+
+img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+
+ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
+    background_image(img) +
+    geom_point(aes(color = as.factor(type), size = speed)) +
+    scale_color_discrete(name = "Type") +
+    scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
+    ylim(-150,150) +
+    xlim(-30, 30)
+
+
+
+
+```
+
 ```{r intial_selection, message=FALSE, warning=FALSE}
 apiSelection <- function(api, ...){
   
@@ -230,7 +250,7 @@ apiSelection <- function(api, ...){
     
   }
   else{
-    return("This api is not yet supported. Please select from either 'Coronal Mass Ejection (CME) Analysis' or 'Interplanetary Shock (IPS)'.")
+    return("This api is not yet supported. Please select from either 'Coronal Mass Ejection (CME) Analysis' or 'Asteroid (AST)'.")
   }
 }
 
