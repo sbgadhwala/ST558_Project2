@@ -244,7 +244,7 @@ summary(cmeSampleData %>% select(halfAngle, speed))
 
 
 ```{r inital_plot, warning=FALSE, message=FALSE}
-img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+img <- readJPEG("img\\sun.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
@@ -295,7 +295,7 @@ cmeSampleData %>%
 
 print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
 
-img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+img <- readJPEG("img\\sun.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +

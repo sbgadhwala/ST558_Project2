@@ -154,7 +154,7 @@ asteroidData <- data
 asteroidData
 ```
 
-    ## # A tibble: 71 × 8
+    ## # A tibble: 69 × 8
     ##    Magnitude Minimum_Diameter Maximum_…¹ Relat…² Appro…³ Miss_…⁴ Orbit…⁵ Is_Po…⁶
     ##        <dbl>            <dbl>      <dbl> <chr>   <chr>   <chr>   <chr>   <lgl>  
     ##  1      20.6           0.125      0.280  58294.… 2022-1… 0.4274… Earth   TRUE   
@@ -167,7 +167,7 @@ asteroidData
     ##  8      23             0.0415     0.0928 43343.… 2022-1… 0.1438… Earth   FALSE  
     ##  9      25.2           0.0148     0.0331 31072.… 2022-1… 0.0714… Earth   FALSE  
     ## 10      19.6           0.199      0.444  39910.… 2022-1… 0.2696… Earth   FALSE  
-    ## # … with 61 more rows, and abbreviated variable names ¹​Maximum_Diameter,
+    ## # … with 59 more rows, and abbreviated variable names ¹​Maximum_Diameter,
     ## #   ²​Relative_Velocity, ³​Approach_Date, ⁴​Miss_Distance, ⁵​Orbiting_Body,
     ## #   ⁶​Is_Potentially_Hazardous_Asteroid
 
@@ -270,7 +270,7 @@ summary(cmeSampleData %>% select(halfAngle, speed))
     ##  Max.   :33.00   Max.   :549.0
 
 ``` r
-img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+img <- readJPEG("img\\sun.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
@@ -367,7 +367,7 @@ print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
     ##   South-West          8           0           13          0
 
 ``` r
-img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+img <- readJPEG("img\\sun.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
