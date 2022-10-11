@@ -1,7 +1,10 @@
 ---
 title: "ST558 Project 2"
 author: "Shyam Gadhwala & Kamlesh Pandey"
-output: github_document
+output: 
+  github_document:
+    toc : True
+    
 ---
 
 
