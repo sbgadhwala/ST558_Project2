@@ -162,15 +162,12 @@ return (list(url = url, data = aesData))
   
 }
 
-data <- asteroidData('1994-10-10', '1994-12-10')$data
+astDf <- apiSelection(api = "Asteroids - NeoWs", '1994-10-10', '1994-12-10')$data
 ```
 
 
 ```{r, fig.width= 12 , fig.height=6}
 # EDA on Asteroid data
-
-astDf <- data
-
 
 plot1 <- ggplot(astDf, aes(x = Approach_Date, y = Miss_Distance))
 
@@ -202,6 +199,7 @@ plot2 +
 library(ggplot2)
 
 # correlation plot
+
 ggpairs(astDf, color = 'red', main = 'Scatter Plot')
 
 ```
@@ -267,13 +265,15 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 
 
 ```{r eda_cme, message=FALSE, warning=FALSE}
+
 cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
 
 summary(cmeSampleData %>% select(halfAngle, speed))
 ```
 
 
-```{r inital_plot, warning=FALSE, message=FALSE}
+```{r inital_plot, warning=FALSE, message=FALSE, fig.width= 12 , fig.height=6}
+
 img <- readJPEG("img\\sun.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
@@ -288,6 +288,7 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
 
 
 ```{r categorizeData, warning=FALSE, message=FALSE}
+
 cmeSampleData$type <- as.factor(cmeSampleData$type)
 
 speedClassfication <- c("Slow paced", "Medium Paced", "Fast Paced", "Hyper Paced")
@@ -313,12 +314,13 @@ cmeSampleData
 
 cmeSampleData %>%
   group_by(zone, speedC, type) %>%
-  summarize(avgSpeed = mean(speed), sdSpeed = sd(speed), avgHalfAngle = mean(halfAngle), sdHalfAngle = sd(halfAngle), count = n()) %>%
-  arrange(zone, speedC)
+  summarize(avgSpeed = mean(speed), sdSpeed = sd(speed),
+            avgHalfAngle = mean(halfAngle), 
+            sdHalfAngle = sd(halfAngle), count = n()) %>% arrange(zone, speedC)
 
 ```
 
-```{r cme_con_tbls, message=FALSE, warning=FALSE}
+```{r cme_con_tbls, message=FALSE, warning=FALSE, fig.width= 12 , fig.height=6}
 
 print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
 
