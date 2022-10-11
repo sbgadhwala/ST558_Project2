@@ -260,44 +260,57 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 
 
 ```{r eda_cme, message=FALSE, warning=FALSE}
-cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
+cmeSampleData <- cmeData("2017-01-01", "2020-01-01")$data
 
-summary(cmeSampleData %>% select(halfAngle, speed))
+summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude))
 ```
 
 
-```{r inital_plot, warning=FALSE, message=FALSE}
-img <- readJPEG("img\\sun.jpeg")
+```{r inital_plot, warning=FALSE, message=FALSE, fig.width= 7.5 , fig.height=6}
+img <- readJPEG("img\\sun2.jpeg")
+
+cmeSampleData$type <- as.factor(cmeSampleData$type)
+
+show(ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
+    geom_point(aes(color = type, size = speed)) +
+    ylim(-150,150) +
+    xlim(-90, 90)  +
+  labs(title="Plot showing Corona Mass Ejection on Sun's corona",
+        x ="Latitude", y = "Longitude"))
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
-    geom_point(aes(color = as.factor(type), size = speed)) +
-    #scale_color_discrete(name = "Type") +
-    scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
-    ylim(-150,150) +
-    xlim(-30, 30)
-
+    geom_point(aes(color = type, size = speed)) +
+    ylim(-180,180) +
+    xlim(-90, 90)  +
+  labs(title="Plot showing Corona Mass Ejection on Sun's corona",
+        x ="Latitude", y = "Longitude")
 ```
 
 
 ```{r categorizeData, warning=FALSE, message=FALSE}
-cmeSampleData$type <- as.factor(cmeSampleData$type)
+#cmeSampleData$type <- as.factor(cmeSampleData$type)
 
 speedClassfication <- c("Slow paced", "Medium Paced", "Fast Paced", "Hyper Paced")
 
 cmeSampleData <- cmeSampleData %>% 
-  mutate(speedC = as.factor(if_else(speed < 200, speedClassfication[1],
-                                            if_else(speed < 350,  speedClassfication[2],
-                                                    if_else(speed < 500, speedClassfication[3], speedClassfication[4])))))
+  mutate(speedC = as.factor(if_else(speed < 500, speedClassfication[1],
+                                            if_else(speed < 1000,  speedClassfication[2],
+                                                    if_else(speed < 2000, speedClassfication[3], speedClassfication[4])))))
 
 
 zones <- c("North-East", "North-West", "South-East", "South-West")
-
 cmeSampleData <- cmeSampleData %>%
   mutate(zone = as.factor(if_else(latitude>=0 & longitude>=0, zones[1],
                         if_else(latitude<=0 & longitude>=0,zones[2],
                                 if_else(latitude<=0 & longitude<=0, zones[4],
                                         if_else(latitude>=0 & longitude<=0, zones[3], "Error"))))))
+
+angles <- c("low", "medium", "high")
+cmeSampleData <- cmeSampleData %>% 
+  mutate(halfAngleC = as.factor(if_else(halfAngle <= 25, angles[1],
+                                            if_else(halfAngle <= 45,  angles[2],
+                                                     angles[3]))))
 
 cmeSampleData
 ```
@@ -311,34 +324,34 @@ cmeSampleData %>%
 
 ```
 
-```{r cme_con_tbls, message=FALSE, warning=FALSE}
+```{r cme_con_tbls, message=FALSE, warning=FALSE, fig.width= 7.5 , fig.height=6}
 
 print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
 
-img <- readJPEG("img\\sun.jpeg")
+img <- readJPEG("img\\sun2.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
     geom_point(aes(color = zone, size = speedC, shape = type)) +
     #scale_shape_discrete(name = "Type", labels = c("S", "C")) +
     #scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
-    scale_size_discrete(name = "speed", labels = c("slow", "medium", "fast", "hyper")) + 
-    ylim(-150,150) +
-    xlim(-30, 30) +
+    scale_size_discrete(name = "speed", labels = c(speedClassfication[1], speedClassfication[2], speedClassfication[3], speedClassfication[4])) + 
+    ylim(-180,180) +
+    xlim(-90, 90) +
   
-    annotate(geom="text", x=20, y=100, label=paste0("North-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[1])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[1]))$speed),
-                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[1]))$halfAngle)),
+    annotate(geom="text", x=70, y=150, label=paste0("North-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[1])), "\navgSpeed : ", round(mean((cmeSampleData %>% filter(zone == zones[1]))$speed), 2),
+                                                  "\navgHalfAngle : ", round(mean((cmeSampleData %>% filter(zone == zones[1]))$halfAngle), 2)),
               color="White", size=4) + 
   
-  annotate(geom="text", x=-20, y=100, label=paste0("North-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[2])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[2]))$speed),
-                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[2]))$halfAngle)),
+  annotate(geom="text", x=-70, y=150, label=paste0("North-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[2])), "\navgSpeed : ", round(mean((cmeSampleData %>% filter(zone == zones[2]))$speed), 2),
+                                                  "\navgHalfAngle : ", round(mean((cmeSampleData %>% filter(zone == zones[2]))$halfAngle), 2)),
               color="White", size=4) + 
   
-  annotate(geom="text", x=-20, y=-100, label=paste0("South-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[4])), "\navgSpeed : ", mean((cmeSampleData %>% filter(zone == zones[4]))$speed),
-                                                  "\navgHalfAngle : ", mean((cmeSampleData %>% filter(zone == zones[4]))$halfAngle)),
+  annotate(geom="text", x=-70, y=-150, label=paste0("South-West Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[4])), "\navgSpeed : ", round(mean((cmeSampleData %>% filter(zone == zones[4]))$speed), 2),
+                                                  "\navgHalfAngle : ", round(mean((cmeSampleData %>% filter(zone == zones[4]))$halfAngle), 2)),
               color="White", size=4) + 
   
-  annotate(geom="text", x=20, y=-100, label=paste0("South-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[3])), "\navgSpeed : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$speed), 2),
+  annotate(geom="text", x=70, y=-150, label=paste0("South-East Region\ncount : ", nrow(cmeSampleData %>% filter(zone==zones[3])), "\navgSpeed : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$speed), 2),
                                                   "\navgHalfAngle : ", round(mean((cmeSampleData %>% filter(zone == zones[3]))$halfAngle), 2)),
               color="White", size=4) +
   labs(title="Plot showing zone-wise Corona Mass Ejection statistics",
@@ -346,6 +359,50 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
 
 ```
 
+```{r cor, message=FALSE, warning=FALSE}
+
+cor <- cor(cmeSampleData$halfAngle, cmeSampleData$speed)
+  ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
+    geom_point(aes(color = type)) + 
+    geom_smooth(method = "lm")
+
+```
+
+```{r barplot}
+ggplot(cmeSampleData, aes(x = type)) + 
+  geom_bar(aes(fill = halfAngleC), position = "dodge") + 
+  scale_fill_discrete(name = "HalfAngle") + 
+  facet_grid(. ~ zone)
+
+```
+
+```{r hist}
+dates = c()
+for (i in 1:nrow(cmeSampleData)){
+  dates <- append(dates, strsplit(cmeSampleData$time[i], split="T")[[1]][1])
+}
+cmeSampleData$date <- dates
+
+months = c()
+for (i in 1:nrow(cmeSampleData)){
+  months <- append(months, strsplit(cmeSampleData$date[i], split="-")[[1]][2])
+}
+cmeSampleData$nummonth <- as.numeric(months)
+allmonths <- c("Jan","Feb","Mar",
+              "Apr","May","Jun",
+              "Jul","Aug","Sep",
+              "Oct","Nov","Dec")
+cmeSampleData$month <- allmonths[cmeSampleData$nummonth]
+cmeSampleData$month <- as.factor(cmeSampleData$month)
+
+cmeSampleData$month <- factor(cmeSampleData$month, ordered = TRUE, levels = c("Jan","Feb","Mar",
+              "Apr","May","Jun",
+              "Jul","Aug","Sep",
+              "Oct","Nov","Dec"))
+
+ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
+  geom_histogram(aes(fill=type), stat="count")
+```
 
 
 ```{r intial_selection, message=FALSE, warning=FALSE}
