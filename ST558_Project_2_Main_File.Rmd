@@ -7,7 +7,12 @@ output:
     
 ---
 
+This vignette is based on the NASA API. The primary purpose of this vignette is to download data from the API and explore visualization package ggplot for exploratory data analysis purpose. 
 
+[NASA API](https://api.nasa.gov/index.html)
+
+
+# Requirement
 
 ```{r, warning=FALSE, message=FALSE}
 library(httr)
