@@ -34,7 +34,7 @@ library(ggplot2)
 library(ggpubr)
 library(jpeg)
 library(lubridate)
-
+library(GGally)
 ```
 
 # Asteroid - NeoWs API
@@ -136,9 +136,9 @@ asteroidData <- function(start_date, end_date, ...){
             
           }
           
-          missDist <- append(missDist, tempDist)
+          missDist <- append(missDist, as.numeric(tempDist))
           Date <- append(Date, tempDate)
-          velocity <-append(velocity, tempVel)
+          velocity <-append(velocity, as.numeric(tempVel))
           magnitude <- append(magnitude, absMag)
           dMin <- append(dMin, dMin_)
           dMax <- append(dMax, dMax_)
@@ -169,13 +169,10 @@ data <- asteroidData('1994-10-10', '1994-12-10')$data
 ```{r, fig.width= 12 , fig.height=6}
 # EDA on Asteroid data
 
-asteroidData <- data
-
-asteroidData
-# First round up to two values 
+astDf <- data
 
 
-plot1 <- ggplot(asteroidData, aes(x = Approach_Date, y = Miss_Distance))
+plot1 <- ggplot(astDf, aes(x = Approach_Date, y = Miss_Distance))
 
 plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
   theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())+
@@ -190,7 +187,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
 # boxplot for min and max diamter
 
 par(mfrow = c(1,2))
-plot2 <- ggplot(asteroidData, aes(x = Is_Potentially_Hazardous_Asteroid,  y = Minimum_Diameter))
+plot2 <- ggplot(astDf, aes(x = Is_Potentially_Hazardous_Asteroid,  y = Minimum_Diameter))
 
 plot2 + 
   geom_boxplot() + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid), position = 'jitter') + 
@@ -199,6 +196,16 @@ plot2 +
   ylab('Minimum Diamter')
 
 ```
+
+```{r, fig.width= 12 , fig.height=10, message  =FALSE, warning=FALSE}
+
+library(ggplot2)
+
+# correlation plot
+ggpairs(astDf, color = 'red', main = 'Scatter Plot')
+
+```
+
 
 
 # Shyam#####################################
