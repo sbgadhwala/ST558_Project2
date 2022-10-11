@@ -267,7 +267,7 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 ```{r eda_cme, message=FALSE, warning=FALSE}
 cmeSampleData <- cmeData("2017-01-01", "2020-01-01")$data
 
-cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
+#cmeSampleData <- cmeData("2019-11-10", "2020-11-10")$data
 
 summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude))
 ```
@@ -286,7 +286,7 @@ show(ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude"))
 ```
 
-```{r inital_plot, warning=FALSE, message=FALSE, fig.width= 12 , fig.height=6}
+```{r inital_plot, warning=FALSE, message=FALSE, fig.width= 7.5 , fig.height=6}
 
 img <- readJPEG("img\\sun2.jpeg")
 
@@ -339,7 +339,6 @@ cmeSampleData %>%
 
 ```
 
-<<<<<<< HEAD
 ```{r cme_con_tbls, message=FALSE, warning=FALSE, fig.width= 7.5 , fig.height=6}
 
 print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
@@ -378,7 +377,8 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
 ```{r cor, message=FALSE, warning=FALSE}
 
 cor <- cor(cmeSampleData$halfAngle, cmeSampleData$speed)
-  ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
+  
+ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
     geom_point(aes(color = type)) + 
     geom_smooth(method = "lm")
 
