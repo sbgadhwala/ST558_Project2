@@ -11,8 +11,19 @@ This vignette is based on the NASA API. The primary purpose of this vignette is 
 
 [NASA API](https://api.nasa.gov/index.html)
 
-
 # Requirement
+
+For this project following packages are used.
+
+[httr](https://httr.r-lib.org/) to provide a wrapper function and customized to the demand of modern web APIs.
+
+[jsonline](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) to provide flexibility in mapping json and R data
+
+[lubridate](https://lubridate.tidyverse.org/) to manipulate date and time
+
+[ggplot](https://ggplot2.tidyverse.org/) used for creating graphics
+
+[tidyverse](https://www.tidyverse.org/) for data analysis purpose
 
 ```{r, warning=FALSE, message=FALSE}
 library(httr)
@@ -40,6 +51,9 @@ Close-Approach (CA) Date : Date (TBD) of closest Earth approach.
 
 V Relative : Object velocity relative to the earth
 
+Maximum_Diameter (miles): Estimated maximum diameter in miles
+
+Minimum_Diameter (miles): Estimated minimum diameter in miles
 
 
 ```{r irs, warning=FALSE, message=FALSE}
@@ -152,7 +166,7 @@ data <- asteroidData('1994-10-10', '1994-12-10')$data
 ```
 
 
-```{r, fig.width= 8, fig.height=6}
+```{r, fig.width= 12 , fig.height=6}
 # EDA on Asteroid data
 
 asteroidData <- data
@@ -164,11 +178,15 @@ asteroidData
 plot1 <- ggplot(asteroidData, aes(x = Approach_Date, y = Miss_Distance))
 
 plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
-  theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())
+  theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())+
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank()
+        )
 
 ```
 
 ```{r}
+
 # boxplot for min and max diamter
 par(mfrow = c(1,2))
 plot2 <- ggplot(asteroidData, aes(y = Minimum_Diameter))
@@ -258,9 +276,6 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
     ylim(-150,150) +
     xlim(-30, 30)
-
-
-
 
 ```
 

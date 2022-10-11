@@ -2,8 +2,24 @@ ST558 Project 2
 ================
 Shyam Gadhwala & Kamlesh Pandey
 
--   <a href="#asteroid---neows-api" id="toc-asteroid---neows-api">Asteroid -
-    NeoWs API</a>
+-   [Requirement](#requirement)
+-   [Asteroid - NeoWs API](#asteroid---neows-api)
+
+This vignette is based on the NASA API. The primary purpose of this
+vignette is to download data from the API and explore visualization
+package ggplot for exploratory data analysis purpose.
+
+[NASA API](https://api.nasa.gov/index.html)
+
+# Requirement
+
+For this project following packages are used.
+[httr](https://httr.r-lib.org/) to provide a wrapper function and
+customized to the demand of modern web APIs.
+[jsonline](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html)
+to provide flexibility in mapping json and R data
+[lubridate](https://lubridate.tidyverse.org/) to manipulate date and
+time
 
 ``` r
 library(httr)
@@ -154,22 +170,21 @@ asteroidData <- data
 asteroidData
 ```
 
-    ## # A tibble: 69 × 8
-    ##    Magnitude Minimum_Diameter Maximum_…¹ Relat…² Appro…³ Miss_…⁴ Orbit…⁵ Is_Po…⁶
-    ##        <dbl>            <dbl>      <dbl> <chr>   <chr>   <chr>   <chr>   <lgl>  
-    ##  1      20.6           0.125      0.280  58294.… 2022-1… 0.4274… Earth   TRUE   
-    ##  2      22.1           0.0628     0.140  104578… 2022-1… 0.3748… Earth   FALSE  
-    ##  3      21.1           0.0995     0.223  85022.… 2022-1… 0.4388… Earth   FALSE  
-    ##  4      24.5           0.0208     0.0465 43495.… 2022-1… 0.0157… Earth   FALSE  
-    ##  5      21             0.104      0.233  67428.… 2022-1… 0.2604… Earth   TRUE   
-    ##  6      21.2           0.0950     0.213  7036.8… 2022-1… 0.2865… Earth   FALSE  
-    ##  7      24.2           0.0234     0.0524 68965.… 2022-1… 0.4814… Earth   FALSE  
-    ##  8      23             0.0415     0.0928 43343.… 2022-1… 0.1438… Earth   FALSE  
-    ##  9      25.2           0.0148     0.0331 31072.… 2022-1… 0.0714… Earth   FALSE  
-    ## 10      19.6           0.199      0.444  39910.… 2022-1… 0.2696… Earth   FALSE  
-    ## # … with 59 more rows, and abbreviated variable names ¹​Maximum_Diameter,
-    ## #   ²​Relative_Velocity, ³​Approach_Date, ⁴​Miss_Distance, ⁵​Orbiting_Body,
-    ## #   ⁶​Is_Potentially_Hazardous_Asteroid
+    ## # A tibble: 69 x 8
+    ##    Magnitude Minimum_Diameter Maximum_Diameter Relative_Velocity Approach_Date
+    ##        <dbl>            <dbl>            <dbl> <chr>             <chr>        
+    ##  1      20.6           0.125            0.280  58294.7763241986  2022-10-14   
+    ##  2      22.1           0.0628           0.140  104578.8548585512 2022-10-14   
+    ##  3      21.1           0.0995           0.223  85022.4092955509  2022-10-14   
+    ##  4      24.5           0.0208           0.0465 43495.8399718031  2022-10-14   
+    ##  5      21             0.104            0.233  67428.07044759    2022-10-14   
+    ##  6      21.2           0.0950           0.213  7036.8960810754   2022-10-14   
+    ##  7      24.2           0.0234           0.0524 68965.6224563723  2022-10-14   
+    ##  8      23             0.0415           0.0928 43343.5893564928  2022-10-14   
+    ##  9      25.2           0.0148           0.0331 31072.0941864462  2022-10-14   
+    ## 10      19.6           0.199            0.444  39910.6293348686  2022-10-15   
+    ## # ... with 59 more rows, and 3 more variables: Miss_Distance <chr>,
+    ## #   Orbiting_Body <chr>, Is_Potentially_Hazardous_Asteroid <lgl>
 
 ``` r
 # First round up to two values 
@@ -181,7 +196,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
   theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ``` r
 # boxplot for min and max diamter
@@ -192,7 +207,7 @@ plot2 +
   geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 plot3 <- ggplot(asteroidData, aes(y = Maximum_Diameter))
@@ -201,7 +216,7 @@ plot3 +
   geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
 
 ``` r
 cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
@@ -281,7 +296,7 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     xlim(-30, 30)
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/inital_plot-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/inital_plot-1.png)<!-- -->
 
 ``` r
 cmeSampleData$type <- as.factor(cmeSampleData$type)
@@ -305,20 +320,20 @@ cmeSampleData <- cmeSampleData %>%
 cmeSampleData
 ```
 
-    ## # A tibble: 97 × 8
+    ## # A tibble: 97 x 8
     ##    time              latitude longitude halfAngle speed type  speedC       zone 
     ##    <chr>                <dbl>     <dbl>     <dbl> <dbl> <fct> <fct>        <fct>
-    ##  1 2019-11-21T01:10Z        9        33        12   383 S     Fast Paced   Nort…
-    ##  2 2019-11-28T09:11Z        7       -90         5   224 S     Medium Paced Sout…
-    ##  3 2019-12-04T11:03Z       -2       -91         8   259 S     Medium Paced Sout…
-    ##  4 2019-12-06T17:45Z       -1       -85        12   356 S     Fast Paced   Sout…
-    ##  5 2019-12-12T23:13Z       -4       -88        10   211 S     Medium Paced Sout…
-    ##  6 2019-12-31T00:59Z      -11       152        20   163 S     Slow paced   Nort…
-    ##  7 2020-01-06T16:13Z       -2         9        19   227 S     Medium Paced Nort…
-    ##  8 2020-01-15T03:44Z       -5        12         6   205 S     Medium Paced Nort…
-    ##  9 2020-01-19T23:11Z        5      -115        17   193 S     Slow paced   Sout…
-    ## 10 2020-01-26T04:27Z        2       -17        10   362 S     Fast Paced   Sout…
-    ## # … with 87 more rows
+    ##  1 2019-11-21T01:10Z        9        33        12   383 S     Fast Paced   Nort~
+    ##  2 2019-11-28T09:11Z        7       -90         5   224 S     Medium Paced Sout~
+    ##  3 2019-12-04T11:03Z       -2       -91         8   259 S     Medium Paced Sout~
+    ##  4 2019-12-06T17:45Z       -1       -85        12   356 S     Fast Paced   Sout~
+    ##  5 2019-12-12T23:13Z       -4       -88        10   211 S     Medium Paced Sout~
+    ##  6 2019-12-31T00:59Z      -11       152        20   163 S     Slow paced   Nort~
+    ##  7 2020-01-06T16:13Z       -2         9        19   227 S     Medium Paced Nort~
+    ##  8 2020-01-15T03:44Z       -5        12         6   205 S     Medium Paced Nort~
+    ##  9 2020-01-19T23:11Z        5      -115        17   193 S     Slow paced   Sout~
+    ## 10 2020-01-26T04:27Z        2       -17        10   362 S     Fast Paced   Sout~
+    ## # ... with 87 more rows
 
 ``` r
 cmeSampleData %>%
@@ -327,7 +342,7 @@ cmeSampleData %>%
   arrange(zone, speedC)
 ```
 
-    ## # A tibble: 12 × 8
+    ## # A tibble: 12 x 8
     ## # Groups:   zone, speedC [12]
     ##    zone       speedC       type  avgSpeed sdSpeed avgHalfAngle sdHalfAngle count
     ##    <fct>      <fct>        <fct>    <dbl>   <dbl>        <dbl>       <dbl> <int>
@@ -397,7 +412,7 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
 
 ``` r
 apiSelection <- function(api, ...){
