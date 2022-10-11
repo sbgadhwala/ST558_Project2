@@ -185,23 +185,23 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
 
 ```
 
-```{r}
+```{r, fig.width= 12 , fig.height=6}
 
 # boxplot for min and max diamter
+
 par(mfrow = c(1,2))
-plot2 <- ggplot(asteroidData, aes(y = Minimum_Diameter))
+plot2 <- ggplot(asteroidData, aes(x = Is_Potentially_Hazardous_Asteroid,  y = Minimum_Diameter))
 
 plot2 + 
-  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
-
-plot3 <- ggplot(asteroidData, aes(y = Maximum_Diameter))
-
-plot3 + 
-  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+  geom_boxplot() + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid), position = 'jitter') + 
+  labs('Box Plot for Minimum Diameter') + 
+  xlab('If Asteroid Hazardous ') + 
+  ylab('Minimum Diamter')
 
 ```
 
 
+# Shyam#####################################
 
 ```{r cme, message=FALSE, warning=FALSE}
 
