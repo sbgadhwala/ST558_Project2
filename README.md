@@ -2,6 +2,33 @@ ST558 Project 2
 ================
 Shyam Gadhwala & Kamlesh Pandey
 
+-   [Requirement](#requirement)
+-   [Asteroid - NeoWs API](#asteroid---neows-api)
+-   [Shyam](#shyam)
+
+This vignette is based on the NASA API. The primary purpose of this
+vignette is to download data from the API and explore visualization
+package ggplot for exploratory data analysis purpose.
+
+[NASA API](https://api.nasa.gov/index.html)
+
+# Requirement
+
+For this project following packages are used.
+
+[httr](https://httr.r-lib.org/) to provide a wrapper function and
+customized to the demand of modern web APIs.
+
+[jsonline](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html)
+to provide flexibility in mapping json and R data
+
+[lubridate](https://lubridate.tidyverse.org/) to manipulate date and
+time
+
+[ggplot](https://ggplot2.tidyverse.org/) used for creating graphics
+
+[tidyverse](https://www.tidyverse.org/) for data analysis purpose
+
 ``` r
 library(httr)
 library(tidyverse)
@@ -11,6 +38,7 @@ library(ggplot2)
 library(ggpubr)
 library(jpeg)
 library(lubridate)
+library(GGally)
 ```
 
 # Asteroid - NeoWs API
@@ -32,6 +60,10 @@ comets.
 Close-Approach (CA) Date : Date (TBD) of closest Earth approach.
 
 V Relative : Object velocity relative to the earth
+
+Maximum_Diameter (miles): Estimated maximum diameter in miles
+
+Minimum_Diameter (miles): Estimated minimum diameter in miles
 
 ``` r
 asteroidData <- function(start_date, end_date, ...){
@@ -112,9 +144,9 @@ asteroidData <- function(start_date, end_date, ...){
             
           }
           
-          missDist <- append(missDist, tempDist)
+          missDist <- append(missDist, as.numeric(tempDist))
           Date <- append(Date, tempDate)
-          velocity <-append(velocity, tempVel)
+          velocity <-append(velocity, as.numeric(tempVel))
           magnitude <- append(magnitude, absMag)
           dMin <- append(dMin, dMin_)
           dMax <- append(dMax, dMax_)
@@ -146,62 +178,45 @@ data <- asteroidData('1994-10-10', '1994-12-10')$data
 ``` r
 # EDA on Asteroid data
 
-asteroidData <- data
-
-asteroidData
-```
-
-    ## # A tibble: 71 × 8
-    ##    Magnitude Minimum_…¹ Maxim…² Relat…³ Appro…⁴ Miss_…⁵
-    ##        <dbl>      <dbl>   <dbl> <chr>   <chr>   <chr>  
-    ##  1      20.6     0.125   0.280  58294.… 2022-1… 0.4274…
-    ##  2      22.1     0.0628  0.140  104578… 2022-1… 0.3748…
-    ##  3      21.1     0.0995  0.223  85022.… 2022-1… 0.4388…
-    ##  4      24.5     0.0208  0.0465 43495.… 2022-1… 0.0157…
-    ##  5      21       0.104   0.233  67428.… 2022-1… 0.2604…
-    ##  6      21.2     0.0950  0.213  7036.8… 2022-1… 0.2865…
-    ##  7      24.2     0.0234  0.0524 68965.… 2022-1… 0.4814…
-    ##  8      23       0.0415  0.0928 43343.… 2022-1… 0.1438…
-    ##  9      25.2     0.0148  0.0331 31072.… 2022-1… 0.0714…
-    ## 10      19.6     0.199   0.444  39910.… 2022-1… 0.2696…
-    ## # … with 61 more rows, 2 more variables:
-    ## #   Orbiting_Body <chr>,
-    ## #   Is_Potentially_Hazardous_Asteroid <lgl>, and
-    ## #   abbreviated variable names ¹​Minimum_Diameter,
-    ## #   ²​Maximum_Diameter, ³​Relative_Velocity,
-    ## #   ⁴​Approach_Date, ⁵​Miss_Distance
-
-``` r
-# First round up to two values 
+astDf <- data
 
 
-plot1 <- ggplot(asteroidData, aes(x = Approach_Date, y = Miss_Distance))
+plot1 <- ggplot(astDf, aes(x = Approach_Date, y = Miss_Distance))
 
 plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
-  theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())
+  theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())+
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank()
+        )
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
 # boxplot for min and max diamter
+
 par(mfrow = c(1,2))
-plot2 <- ggplot(asteroidData, aes(y = Minimum_Diameter))
+plot2 <- ggplot(astDf, aes(x = Is_Potentially_Hazardous_Asteroid,  y = Minimum_Diameter))
 
 plot2 + 
-  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+  geom_boxplot() + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid), position = 'jitter') + 
+  labs('Box Plot for Minimum Diameter') + 
+  xlab('If Asteroid Hazardous ') + 
+  ylab('Minimum Diamter')
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ``` r
-plot3 <- ggplot(asteroidData, aes(y = Maximum_Diameter))
+library(ggplot2)
 
-plot3 + 
-  geom_boxplot(aes(color=Is_Potentially_Hazardous_Asteroid))
+# correlation plot
+ggpairs(astDf, color = 'red', main = 'Scatter Plot')
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+
+# Shyam
 
 ``` r
 cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
@@ -270,7 +285,7 @@ summary(cmeSampleData %>% select(halfAngle, speed))
     ##  Max.   :33.00   Max.   :549.0
 
 ``` r
-img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+img <- readJPEG("img\\sun.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
@@ -305,22 +320,23 @@ cmeSampleData <- cmeSampleData %>%
 cmeSampleData
 ```
 
-    ## # A tibble: 97 × 8
-    ##    time      latit…¹ longi…² halfA…³ speed type  speedC
-    ##    <chr>       <dbl>   <dbl>   <dbl> <dbl> <fct> <fct> 
-    ##  1 2019-11-…       9      33      12   383 S     Fast …
-    ##  2 2019-11-…       7     -90       5   224 S     Mediu…
-    ##  3 2019-12-…      -2     -91       8   259 S     Mediu…
-    ##  4 2019-12-…      -1     -85      12   356 S     Fast …
-    ##  5 2019-12-…      -4     -88      10   211 S     Mediu…
-    ##  6 2019-12-…     -11     152      20   163 S     Slow …
-    ##  7 2020-01-…      -2       9      19   227 S     Mediu…
-    ##  8 2020-01-…      -5      12       6   205 S     Mediu…
-    ##  9 2020-01-…       5    -115      17   193 S     Slow …
-    ## 10 2020-01-…       2     -17      10   362 S     Fast …
-    ## # … with 87 more rows, 1 more variable: zone <fct>,
-    ## #   and abbreviated variable names ¹​latitude,
-    ## #   ²​longitude, ³​halfAngle
+    ## # A tibble: 97 x 8
+    ##    time  latitude longitude halfAngle
+    ##    <chr>    <dbl>     <dbl>     <dbl>
+    ##  1 2019~        9        33        12
+    ##  2 2019~        7       -90         5
+    ##  3 2019~       -2       -91         8
+    ##  4 2019~       -1       -85        12
+    ##  5 2019~       -4       -88        10
+    ##  6 2019~      -11       152        20
+    ##  7 2020~       -2         9        19
+    ##  8 2020~       -5        12         6
+    ##  9 2020~        5      -115        17
+    ## 10 2020~        2       -17        10
+    ## # ... with 87 more rows, and 4 more
+    ## #   variables: speed <dbl>,
+    ## #   type <fct>, speedC <fct>,
+    ## #   zone <fct>
 
 ``` r
 cmeSampleData %>%
@@ -329,25 +345,26 @@ cmeSampleData %>%
   arrange(zone, speedC)
 ```
 
-    ## # A tibble: 12 × 8
+    ## # A tibble: 12 x 8
     ## # Groups:   zone, speedC [12]
-    ##    zone    speedC type  avgSp…¹ sdSpeed avgHa…² sdHal…³
-    ##    <fct>   <fct>  <fct>   <dbl>   <dbl>   <dbl>   <dbl>
-    ##  1 North-… Fast … S        368.   20.5     17.2    7.42
-    ##  2 North-… Mediu… S        261.   41.4     17.6    6.94
-    ##  3 North-… Slow … S        148.   21.7     16.6    8.30
-    ##  4 North-… Fast … S        401    30.1     19.5    8.39
-    ##  5 North-… Mediu… S        263.   36.8     16.4    6.93
-    ##  6 North-… Slow … S        151.   23.0     20.8    4.71
-    ##  7 South-… Fast … S        428    51.5     18.5    9.46
-    ##  8 South-… Mediu… S        275.   46.7     17.3    6.57
-    ##  9 South-… Slow … S        190.    3.65    24.8    6.61
-    ## 10 South-… Fast … S        410.   39.9     18.2   10.2 
-    ## 11 South-… Hyper… C        534.   19.6     21      8.83
-    ## 12 South-… Mediu… S        263.   41.6     17.2    6.34
-    ## # … with 1 more variable: count <int>, and abbreviated
-    ## #   variable names ¹​avgSpeed, ²​avgHalfAngle,
-    ## #   ³​sdHalfAngle
+    ##    zone       speedC   type  avgSpeed
+    ##    <fct>      <fct>    <fct>    <dbl>
+    ##  1 North-East Fast Pa~ S         368.
+    ##  2 North-East Medium ~ S         261.
+    ##  3 North-East Slow pa~ S         148.
+    ##  4 North-West Fast Pa~ S         401 
+    ##  5 North-West Medium ~ S         263.
+    ##  6 North-West Slow pa~ S         151.
+    ##  7 South-East Fast Pa~ S         428 
+    ##  8 South-East Medium ~ S         275.
+    ##  9 South-East Slow pa~ S         190.
+    ## 10 South-West Fast Pa~ S         410.
+    ## 11 South-West Hyper P~ C         534.
+    ## 12 South-West Medium ~ S         263.
+    ## # ... with 4 more variables:
+    ## #   sdSpeed <dbl>,
+    ## #   avgHalfAngle <dbl>,
+    ## #   sdHalfAngle <dbl>, count <int>
 
 ``` r
 print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
@@ -356,35 +373,35 @@ print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
     ## , ,  = C
     ## 
     ##             
-    ##              Fast Paced Hyper Paced Medium Paced
-    ##   North-East          0           0            0
-    ##   North-West          0           0            0
-    ##   South-East          0           0            0
-    ##   South-West          0           4            0
+    ##              Fast Paced Hyper Paced
+    ##   North-East          0           0
+    ##   North-West          0           0
+    ##   South-East          0           0
+    ##   South-West          0           4
     ##             
-    ##              Slow paced
-    ##   North-East          0
-    ##   North-West          0
-    ##   South-East          0
-    ##   South-West          0
+    ##              Medium Paced Slow paced
+    ##   North-East            0          0
+    ##   North-West            0          0
+    ##   South-East            0          0
+    ##   South-West            0          0
     ## 
     ## , ,  = S
     ## 
     ##             
-    ##              Fast Paced Hyper Paced Medium Paced
-    ##   North-East          2           0           14
-    ##   North-West          4           0           16
-    ##   South-East          6           0           16
-    ##   South-West          8           0           13
+    ##              Fast Paced Hyper Paced
+    ##   North-East          2           0
+    ##   North-West          4           0
+    ##   South-East          6           0
+    ##   South-West          8           0
     ##             
-    ##              Slow paced
-    ##   North-East          4
-    ##   North-West          5
-    ##   South-East          5
-    ##   South-West          0
+    ##              Medium Paced Slow paced
+    ##   North-East           14          4
+    ##   North-West           16          5
+    ##   South-East           16          5
+    ##   South-West           13          0
 
 ``` r
-img <- readJPEG("C:\\Users\\sbgad\\Desktop\\EIhCLr.jpeg")
+img <- readJPEG("img\\sun.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
