@@ -208,7 +208,7 @@ ggpairs(astDf, color = 'red', main = 'Scatter Plot')
 
 # Coronal Mass Ejection (CME) Analysis
 
-The sun of our solar system has multiple atmospheric layers. The inner layers are the Core, Radiative Zone and Convection Zone. The outer layers are the Photosphere, the Chromosphere, the Transition Region and the Corona. Coronal Mass Ejection (CME) phenomena is when there are huge explosions of plasma and field from the sun's corona layer. These explosions typically have certain path and speed when they are emitted in the heliosphere. Sometimes intense CMEs travel at speeds more than 3000 km/s. The radiation or the solar wind takes up to 17-18hours to reach earth. Hence, to predict severe solar radiation, we need to see the characteristics of the explosions, and find any correlations between its properties.
+The sun of our solar system has multiple atmospheric layers. The inner layers are the Core, Radiative Zone and Convection Zone. The outer layers are the Photo sphere, the Chromosphere, the Transition Region and the Corona. Coronal Mass Ejection (CME) phenomena is when there are huge explosions of plasma and field from the sun's corona layer. These explosions typically have certain path and speed when they are emitted in the heliosphere. Sometimes intense CMEs travel at speeds more than 3000 km/s. The radiation or the solar wind takes up to 17-18hours to reach earth. Hence, to predict severe solar radiation, we need to see the characteristics of the explosions, and find any correlations between its properties.
 
 ## Coronal Mass Ejection (CME) Analysis API:
 
@@ -363,7 +363,8 @@ summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude))
 ```
 
 To start with the initial EDA, using ggplot2 library, I have made a scatter plot representing the latitude and longitude of each of the CME events taking place on sun's atmosphere.
- The different colored dots represent the different event types, while the size of the dots represent the spped of explosion. the smaller the dot, the lesser the spped of the event and vice versa.
+ The different colored dots represent the different event types, while the size of the dots represent the spped of explosion. the smaller the dot, the lesser the speed of the event and vice versa.
+ 
 ```{r, warning=FALSE, message=FALSE, fig.width= 7.5 , fig.height=6}
 img <- readJPEG("img\\sun2.jpeg")
 
