@@ -25,6 +25,7 @@ For this project following packages are used.
 
 [tidyverse](https://www.tidyverse.org/) for data analysis purpose
 
+
 ```{r, warning=FALSE, message=FALSE}
 library(httr)
 library(tidyverse)
@@ -157,53 +158,13 @@ asteroidData <- function(start_date, end_date, ...){
                     'Miss_Distance' = missDist,
                     'Orbiting_Body' = orbitBody,
                     'Is_Potentially_Hazardous_Asteroid' = isHazard)
-  
+
+# This function will return the URL of the API and the dataset generated
 return (list(url = url, data = aesData))
-  
 }
 
-astDf <- apiSelection(api = "Asteroids - NeoWs", '1994-10-10', '1994-12-10')$data
-```
-
-
-```{r, fig.width= 12 , fig.height=6}
-# EDA on Asteroid data
-
-plot1 <- ggplot(astDf, aes(x = Approach_Date, y = Miss_Distance))
-
-plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
-  theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())+
-  theme(axis.text.y = element_blank(), 
-        axis.ticks.y = element_blank()
-        )
 
 ```
-
-```{r, fig.width= 12 , fig.height=6}
-
-# boxplot for min and max diamter
-
-par(mfrow = c(1,2))
-plot2 <- ggplot(astDf, aes(x = Is_Potentially_Hazardous_Asteroid,  y = Minimum_Diameter))
-
-plot2 + 
-  geom_boxplot() + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid), position = 'jitter') + 
-  labs('Box Plot for Minimum Diameter') + 
-  xlab('If Asteroid Hazardous ') + 
-  ylab('Minimum Diamter')
-
-```
-
-```{r, fig.width= 12 , fig.height=10, message  =FALSE, warning=FALSE}
-
-library(ggplot2)
-
-# correlation plot
-
-ggpairs(astDf, color = 'red', main = 'Scatter Plot')
-
-```
-
 
 
 # Coronal Mass Ejection (CME) Analysis
@@ -249,6 +210,7 @@ The data from the JSON extracted here are:
 *  type: Type of events (classifications include "C", "O", "R", "S")
 
 A tibble is created with the above stated details and is returned from the function along with the URL that was formed from the input values for modifications.
+
 
 ```{r cme, message=FALSE, warning=FALSE}
 
@@ -314,8 +276,6 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 
 ```
 
-
-
 # Parent Wrapper Function
 
 The following the is the main parent wrapper function. This function takes the following input:  
@@ -346,6 +306,60 @@ apiSelection <- function(api, ...){
 
 ```
 
+# Exploratory Data Analysis for Asteroid Data
+
+Calling the API for Asteroid-NEOs from the wrapper function using sample start and end date. Here I have selected start date as 2017-01-01, and the end date as 2020-01-01.
+
+When the API returns the data, the useful data is converted to a tibble and is showed below. I have also called the summary function to get an overview of the data.
+
+```{r eda_cme, message=FALSE, warning=FALSE}
+
+astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2020-01-01')$data
+
+summary(astDf %>% select(Magnitude:Miss_Distance))
+
+```
+
+```{r, fig.width= 12 , fig.height=6}
+
+# EDA on Asteroid data
+
+plot1 <- ggplot(astDf, aes(x = Approach_Date, y = Miss_Distance))
+
+plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
+  theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())+
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank()
+        )
+
+```
+
+```{r, fig.width= 12 , fig.height=6}
+
+# boxplot for min and max diamter
+
+par(mfrow = c(1,2))
+plot2 <- ggplot(astDf, aes(x = Is_Potentially_Hazardous_Asteroid,  y = Minimum_Diameter))
+
+plot2 + 
+  geom_boxplot() + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid), position = 'jitter') + 
+  labs('Box Plot for Minimum Diameter') + 
+  xlab('If Asteroid Hazardous ') + 
+  ylab('Minimum Diamter')
+
+```
+
+```{r, fig.width= 12 , fig.height=10, message  =FALSE, warning=FALSE}
+
+library(ggplot2)
+
+# correlation plot
+numericalDf <- astDf [, c(1,2,3,4,6)]  
+
+ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
+        color = 'Is_Potentially_Hazardous_Asteroid')
+
+```
 
 
 # Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API.
