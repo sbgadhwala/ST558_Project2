@@ -1,31 +1,27 @@
-ST558 Project 2
+ST558 Project 2 - NASA APIs
 ================
 Shyam Gadhwala & Kamlesh Pandey
 
--   <a href="#requirement" id="toc-requirement">Requirement</a>
--   <a href="#asteroid---neows" id="toc-asteroid---neows">Asteroid -
-    NeoWs</a>
-    -   <a href="#asteroid---neows-api" id="toc-asteroid---neows-api">Asteroid -
-        NeoWs API</a>
--   <a href="#coronal-mass-ejection-cme-analysis"
-    id="toc-coronal-mass-ejection-cme-analysis">Coronal Mass Ejection (CME)
-    Analysis</a>
-    -   <a href="#coronal-mass-ejection-cme-analysis-api"
-        id="toc-coronal-mass-ejection-cme-analysis-api">Coronal Mass Ejection
-        (CME) Analysis API:</a>
-    -   <a href="#helper-function-to-get-the-cme-data"
-        id="toc-helper-function-to-get-the-cme-data">Helper function to get the
-        CME data:</a>
--   <a href="#parent-wrapper-function"
-    id="toc-parent-wrapper-function">Parent Wrapper Function</a>
--   <a href="#exploratory-data-analysis-for-asteroid---neows-api-data"
-    id="toc-exploratory-data-analysis-for-asteroid---neows-api-data">Exploratory
-    Data Analysis for Asteroid - NeoWs API Data</a>
--   <a
-    href="#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data"
-    id="toc-exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data">Exploratory
-    Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API
-    Data.</a>
+-   [Introduction](#introduction)
+-   [Asteroid - NeoWs](#asteroid---neows)
+    -   [Asteroid - NeoWs API](#asteroid---neows-api)
+    -   [Helper function to get the Asteroid NeoWs
+        data:](#helper-function-to-get-the-asteroid-neows-data)
+-   [Coronal Mass Ejection (CME)
+    Analysis](#coronal-mass-ejection-cme-analysis)
+    -   [Coronal Mass Ejection (CME) Analysis
+        API:](#coronal-mass-ejection-cme-analysis-api)
+    -   [Helper function to get the CME
+        data:](#helper-function-to-get-the-cme-data)
+-   [Parent Wrapper Function](#parent-wrapper-function)
+-   [Exploratory Data Analysis for Asteroid - NeoWs API
+    Data](#exploratory-data-analysis-for-asteroid---neows-api-data)
+-   [Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME)
+    Analysis API
+    Data.](#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data)
+-   [Ending Remarks](#ending-remarks)
+
+# Introduction
 
 This vignette is based on demonstrating how to interact with the NASA
 APIs. Two of the NASA’s APIs have been used for this project, namely
@@ -35,19 +31,17 @@ of the API, download data from the API and explore visualization package
 ggplot2 for exploratory data analysis of the fetched data to gain
 valuable insights.
 
-[NASA API](https://api.nasa.gov/index.html)
-
-# Requirement
+[NASA API Link](https://api.nasa.gov/index.html)
 
 Few of the essential packages used for this project are:
 
-[httr](https://httr.r-lib.org/) to provide a wrapper function and
+[httr](https://httr.r-lib.org/)to provide a wrapper function and
 customized to the demand of modern web APIs.
 [jsonlite](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html)
 to provide flexibility in mapping json and R data
-[lubridate](https://lubridate.tidyverse.org/) to manipulate date and
-time [ggplot](https://ggplot2.tidyverse.org/) used for creating graphics
-[tidyverse](https://www.tidyverse.org/) for data analysis purpose
+[lubridate](https://lubridate.tidyverse.org/)to manipulate date and time
+[ggplot](https://ggplot2.tidyverse.org/)used for creating graphics
+[tidyverse](https://www.tidyverse.org/)for data analysis purpose
 
 ``` r
 library(httr)
@@ -75,13 +69,30 @@ asteroids and only 1% comet data.
 
 This API offers the following modifications:
 
-1.  Magnitude (H): Asteroid absolute magnitude (in general, smaller H
-    implies larger asteroid diameter). This parameter is undefined for
-    comets.
+1.  Magnitude (H): Asteroid absolute magnitude is the visual magnitude a
+    observer would record if asteroid is place 1AU away from the sun
 2.  Close-Approach (CA) Date : Date (TBD) of closest Earth approach.
 3.  V Relative : Object velocity relative to the earth
 4.  Maximum_Diameter (miles): Estimated maximum diameter in miles
 5.  Minimum_Diameter (miles): Estimated minimum diameter in miles
+
+## Helper function to get the Asteroid NeoWs data:
+
+This function will call the API with desired modification. This API has
+start and end date as modifications. User can provide a date range for
+the API and by GET request we can retrieve the data. The start and end
+date are mandatory input without any default argument.  
+This helper function has multiple checks for correct format for start
+and end date. In case of correct input dates, the modification will be
+added to the API and respective data is generated.
+
+The data columns extracted from the APIs are as follow: 1. Magnitude  
+2. Minimum Diameter(miles)  
+3. Maximum Diameter(miles)  
+4. Relative Velocity  
+5. Approach Date  
+6. Miss Distance (AU)  
+7. Orbiting Body 2. IS Asteroid Potentially hazardous
 
 ``` r
 asteroidData <- function(start_date, end_date, ...){
@@ -116,7 +127,7 @@ asteroidData <- function(start_date, end_date, ...){
     # check if end_date > start_date, if true stop the program
     if (ymd(end_date) < ymd(start_date)){
       message <- paste('End date' , end_date, 'should be greater than the start date', start_date)
-      stop(message())
+      stop(message)
       
       } 
     # if dates are in correct format then execute the code
@@ -128,7 +139,6 @@ asteroidData <- function(start_date, end_date, ...){
         if (diffDate > 8){
           message <- paste('[WARNING..!!] The difference between the date range should be less than 8 days', 
                            'for this current date range the API will return future Approach date ')
-          print(message)
         }
         
         # API Parameters      
@@ -170,9 +180,7 @@ asteroidData <- function(start_date, end_date, ...){
             orbit <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$orbiting_body
             # storing in a temporary factor
             tempOrbit <- append(tempOrbit, orbit)
-            
           }
-          
           missDist <- append(missDist, as.numeric(tempDist))
           Date <- append(Date, tempDate)
           velocity <-append(velocity, as.numeric(tempVel))
@@ -183,7 +191,6 @@ asteroidData <- function(start_date, end_date, ...){
           isHazard <- append(isHazard, isHazard_)
           
   }
-  
       }
   }
   #final tibble
@@ -196,7 +203,7 @@ asteroidData <- function(start_date, end_date, ...){
                     'Orbiting_Body' = orbitBody,
                     'Is_Potentially_Hazardous_Asteroid' = isHazard)
 
-# This function will return the URL of the API and the dataset generated
+# This function will return the URL of the API and the data set generated
 return (list(url = url, data = aesData))
 }
 ```
@@ -380,36 +387,17 @@ apiSelection <- function(api, ...){
 
 Calling the API for Asteroid-NEOs from the wrapper function using sample
 start and end date. Here I have selected start date as 2017-01-01, and
-the end date as 2020-01-01.
+the end date as 2017-08-01.
 
 When the API returns the data, the useful data is converted to a tibble
 and is showed below. I have also called the summary function to get an
-overview of the data.
+overview of numerical feature columns.
 
 ``` r
-astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2020-01-01')$data
+astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2017-08-01')$data
+
+#summary(astDf %>% select(Magnitude:Miss_Distance))
 ```
-
-    ## [1] "[WARNING..!!] The difference between the date range should be less than 8 days for this current date range the API will return future Approach date "
-
-``` r
-summary(astDf %>% select(Magnitude:Miss_Distance))
-```
-
-    ##    Magnitude     Minimum_Diameter   Maximum_Diameter  Relative_Velocity
-    ##  Min.   :15.25   Min.   :0.001896   Min.   :0.00424   Min.   :  6882   
-    ##  1st Qu.:20.43   1st Qu.:0.020792   1st Qu.:0.04649   1st Qu.: 37687   
-    ##  Median :21.57   Median :0.080150   Median :0.17922   Median : 50262   
-    ##  Mean   :22.25   Mean   :0.133732   Mean   :0.29903   Mean   : 52273   
-    ##  3rd Qu.:24.50   3rd Qu.:0.135490   3rd Qu.:0.30296   3rd Qu.: 66063   
-    ##  Max.   :29.70   Max.   :1.471994   Max.   :3.29148   Max.   :123714   
-    ##  Approach_Date      Miss_Distance     
-    ##  Length:73          Min.   :0.003582  
-    ##  Class :character   1st Qu.:0.193351  
-    ##  Mode  :character   Median :0.293841  
-    ##                     Mean   :0.284901  
-    ##                     3rd Qu.:0.390529  
-    ##                     Max.   :0.498633
 
 ``` r
 # EDA on Asteroid data
@@ -423,7 +411,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
         )
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 # boxplot for min and max diamter
@@ -438,7 +426,7 @@ plot2 +
   ylab('Minimum Diamter')
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 library(ggplot2)
@@ -450,7 +438,28 @@ ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
         color = 'Is_Potentially_Hazardous_Asteroid')
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+# creating a new factor for relative speed
+speedClassfication <- c("Low Speed Asteroid", "Medium Speed Asteroid", "High Speed Asteroid" )
+astDf <- astDf %>%
+  mutate(speedBin = factor(if_else(Relative_Velocity<37000, speedClassfication[1],
+                                   if_else(Relative_Velocity<66000, speedClassfication[2],
+                           speedClassfication[3]))))
+# plot
+plot3 <- ggplot(astDf, aes(x = Orbiting_Body, fill = Is_Potentially_Hazardous_Asteroid))
+
+plot3 + geom_bar(stat = 'count', position = position_dodge()) +
+        facet_grid(cols = vars(speedBin), 
+                   labeller = label_both) +                          # 
+                    theme(axis.text.x = element_text(angle = 45), 
+                          legend.title = element_blank()) +
+        xlab('Orbiting Body') +
+        labs(title = "Facet Plot for Relative Velocity Count ")
+```
+
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 # Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API Data.
 
@@ -469,7 +478,7 @@ cmeSampleData <- apiSelection("Coronal Mass Ejection (CME) Analysis", "2017-01-0
 print(cmeSampleData)
 ```
 
-    ## # A tibble: 324 × 6
+    ## # A tibble: 324 x 6
     ##    time              latitude longitude halfAngle speed type 
     ##    <chr>                <dbl>     <dbl>     <dbl> <dbl> <chr>
     ##  1 2017-01-03T13:08Z      -10      -105        20   645 C    
@@ -482,7 +491,7 @@ print(cmeSampleData)
     ##  8 2017-01-18T00:56Z       11       160        11   723 C    
     ##  9 2017-01-19T21:10Z       16       -80        21   429 S    
     ## 10 2017-01-20T17:59Z       21       105        26   276 S    
-    ## # … with 314 more rows
+    ## # ... with 314 more rows
 
 ``` r
 summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude))
@@ -516,7 +525,7 @@ show(ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude"))
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 To see it more in respect to the actual sun’s corona layer, I have
 imported an image of sun and use it as a background to give a better
@@ -533,7 +542,7 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/inital_plot-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/inital_plot-1.png)<!-- -->
 
 To gain more insights about the data, I have segregated the speed,
 location, and half angle from the data.  
@@ -572,20 +581,20 @@ cmeSampleData <- cmeSampleData %>%
 cmeSampleData
 ```
 
-    ## # A tibble: 324 × 9
-    ##    time              latitude longitude halfA…¹ speed type  speedC zone  halfA…²
-    ##    <chr>                <dbl>     <dbl>   <dbl> <dbl> <fct> <fct>  <fct> <fct>  
-    ##  1 2017-01-03T13:08Z      -10      -105      20   645 C     Mediu… Sout… low    
-    ##  2 2017-01-09T00:21Z      -33       -93      26    88 S     Slow … Sout… medium 
-    ##  3 2017-01-11T07:02Z        3       100      22   167 S     Slow … Nort… low    
-    ##  4 2017-01-12T22:42Z        1       -90      36   580 C     Mediu… Sout… medium 
-    ##  5 2017-01-14T09:24Z       10      -155      10   628 C     Mediu… Sout… low    
-    ##  6 2017-01-14T20:06Z       11        90      15   365 S     Slow … Nort… low    
-    ##  7 2017-01-15T15:43Z        0       -48      14   353 S     Slow … Sout… low    
-    ##  8 2017-01-18T00:56Z       11       160      11   723 C     Mediu… Nort… low    
-    ##  9 2017-01-19T21:10Z       16       -80      21   429 S     Slow … Sout… low    
-    ## 10 2017-01-20T17:59Z       21       105      26   276 S     Slow … Nort… medium 
-    ## # … with 314 more rows, and abbreviated variable names ¹​halfAngle, ²​halfAngleC
+    ## # A tibble: 324 x 9
+    ##    time      latitude longitude halfAngle speed type  speedC   zone   halfAngleC
+    ##    <chr>        <dbl>     <dbl>     <dbl> <dbl> <fct> <fct>    <fct>  <fct>     
+    ##  1 2017-01-~      -10      -105        20   645 C     Medium ~ South~ low       
+    ##  2 2017-01-~      -33       -93        26    88 S     Slow Pa~ South~ medium    
+    ##  3 2017-01-~        3       100        22   167 S     Slow Pa~ North~ low       
+    ##  4 2017-01-~        1       -90        36   580 C     Medium ~ South~ medium    
+    ##  5 2017-01-~       10      -155        10   628 C     Medium ~ South~ low       
+    ##  6 2017-01-~       11        90        15   365 S     Slow Pa~ North~ low       
+    ##  7 2017-01-~        0       -48        14   353 S     Slow Pa~ South~ low       
+    ##  8 2017-01-~       11       160        11   723 C     Medium ~ North~ low       
+    ##  9 2017-01-~       16       -80        21   429 S     Slow Pa~ South~ low       
+    ## 10 2017-01-~       21       105        26   276 S     Slow Pa~ North~ medium    
+    ## # ... with 314 more rows
 
 Then from the data, I have grouped the data by combining zone, speed and
 type of event, and for each group, I have calculated the number of
@@ -600,7 +609,7 @@ cmeSampleData %>%
             sdHalfAngle = sd(halfAngle), count = n()) %>% arrange(zone, speedC)
 ```
 
-    ## # A tibble: 11 × 8
+    ## # A tibble: 11 x 8
     ## # Groups:   zone, speedC [11]
     ##    zone       speedC       type  avgSpeed sdSpeed avgHalfAngle sdHalfAngle count
     ##    <fct>      <fct>        <fct>    <dbl>   <dbl>        <dbl>       <dbl> <int>
@@ -783,7 +792,7 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
 
 A correlation plot between speed and half angle is also shown. A linear
 model regression line is also fitted with the help of geom_smooth
@@ -800,7 +809,7 @@ ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
   annotate(geom="text", x=10, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/cor-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/cor-1.png)<!-- -->
 
 Then for each zone, I have plotted the bar plots representing count of
 CME events that are classified by their half angle values.
@@ -814,7 +823,7 @@ ggplot(cmeSampleData, aes(x = type)) +
         x ="Type", y = "Count of CME events")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/barplot-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/barplot-1.png)<!-- -->
 
 Lastly, I took the dates (time-stamp) of events, and extracted months
 from them, and plotted a histogram the count of CME events occurring in
@@ -852,6 +861,6 @@ ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
         x ="Month", y = "Count of CME events")
 ```
 
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+![](ST558_Project_2_Main_File_files/figure-gfm/hist-1.png)<!-- -->
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/hist-1.png)<!-- -->
+# Ending Remarks

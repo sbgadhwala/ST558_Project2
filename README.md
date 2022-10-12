@@ -1,4 +1,4 @@
-ST558 Project 2 - NASA API
+ST558 Project 2 - NASA APIs
 ================
 Shyam Gadhwala & Kamlesh Pandey
 
@@ -19,6 +19,7 @@ Shyam Gadhwala & Kamlesh Pandey
 -   [Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME)
     Analysis API
     Data.](#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data)
+-   [Ending Remarks](#ending-remarks)
 
 # Introduction
 
@@ -453,7 +454,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
         )
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 # boxplot for min and max diamter
@@ -468,7 +469,7 @@ plot2 +
   ylab('Minimum Diamter')
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 library(ggplot2)
@@ -480,7 +481,7 @@ ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
         color = 'Is_Potentially_Hazardous_Asteroid')
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 # creating a new factor for relative speed
@@ -501,7 +502,7 @@ plot3 + geom_bar(stat = 'count', position = position_dodge()) +
         labs(title = "Facet Plot for Relative Velocity Count ")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 # Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API Data.
 
@@ -591,7 +592,7 @@ show(ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude"))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 To see it more in respect to the actual sun’s corona layer, I have
 imported an image of sun and use it as a background to give a better
@@ -1010,3 +1011,5 @@ ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
 ```
 
 ![](README_files/figure-gfm/hist-1.png)<!-- -->
+
+# Ending Remarks
