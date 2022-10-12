@@ -65,34 +65,37 @@ asteroidData <- function(start_date, end_date, ...){
   endpoint <- 'feed'
   url <- paste0(baseURL, endpoint, '?startDate=', start_date, '&endDate=', end_date,'&api_key=', apiKey)
   
+  # GET request for API
   res <- GET(url)
   asteroidData <- fromJSON(rawToChar(res$content))
   
-  # check for date format
+  # check for  correct date format
   dateFormat <- "%Y-%m-%d"
   
+  # check if start and end dates are in correct format or not
   checkStart <- tryCatch(!is.na(as.Date(start_date, dateFormat)), 
              error = function(err) 
              {TRUE})
-  
   checkEnd <- tryCatch(!is.na(as.Date(end_date, dateFormat)), 
              error = function(err) 
              {TRUE})
   
-  # First Check for date format
+  # if eother the start or the end dates are not in correct format stop the program
   if (checkStart == FALSE | checkEnd == FALSE){
     message <- paste('[ERROR..!!] Either your start or end date is not is correct YYYY-MM-DD format')
-    print(message)
     stop(message)
   }
+  # if both start and end dates are in correct format 
   else if(checkStart == TRUE & checkEnd == TRUE){
-    #check if end_date > start_date
+    
+    # check if end_date > start_date, if true stop the program
     if (ymd(end_date) < ymd(start_date)){
       message <- paste('End date' , end_date, 'should be greater than the start date', start_date)
-      print(message)
       stop(message())
       
-      } else if (ymd(end_date) > ymd(start_date)){
+      } 
+    # if dates are in correct format then execute the code
+    else if (ymd(end_date) > ymd(start_date)){
         
         # check for the diff between the start and end date
         diffDate <- difftime(ymd(end_date), ymd(start_date), units = 'days')
@@ -103,7 +106,7 @@ asteroidData <- function(start_date, end_date, ...){
           print(message)
         }
         
-  # API Parameters      
+        # API Parameters      
         magnitude <- c()
         dMin  <- c()
         dMax <- c()
@@ -126,13 +129,21 @@ asteroidData <- function(start_date, end_date, ...){
           
           # for close approach
           for (j in 1:length(asteroidData$near_earth_objects[[i]]$close_approach_data)){
+            # approach velocity from the API
             vel <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$relative_velocity$kilometers_per_hour
+            # storing in a temporary factor
             tempVel <- append(tempVel, vel)
+            # getting date from the API
             date <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$close_approach_date
+            # storing in a temporary factor
             tempDate <- append(tempDate, date)
+            # miss distance from the API
             dist <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$miss_distance$astronomical
+            # storing in a temporary factor
             tempDist <- append(tempDist, dist)
+            # getting orbiting body from the API
             orbit <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$orbiting_body
+            # storing in a temporary factor
             tempOrbit <- append(tempOrbit, orbit)
             
           }
@@ -150,6 +161,7 @@ asteroidData <- function(start_date, end_date, ...){
   
       }
   }
+  final tibble#
   aesData <- tibble('Magnitude' = magnitude, 
                     'Minimum_Diameter' = dMin, 
                     'Maximum_Diameter' = dMax, 
