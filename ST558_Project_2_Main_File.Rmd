@@ -538,6 +538,6 @@ cmeSampleData$month <- factor(cmeSampleData$month, ordered = TRUE, levels = c("J
 ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
   geom_histogram(aes(fill=type), stat="count") + 
   scale_fill_discrete(name = "Type") + 
-  labs(title="Histogram showing count of CME events in month \nthat occurred between the given dates",
+  labs(title="Histogram showing count of CME events in month \nthat occurred between the given dates.",
         x ="Month", y = "Count of CME events")
 ```
