@@ -174,10 +174,7 @@ asteroidData <- function(start_date, end_date, ...){
 # This function will return the URL of the API and the dataset generated
 return (list(url = url, data = aesData))
 }
-
-
 ```
-
 
 # Coronal Mass Ejection (CME) Analysis
 
@@ -324,7 +321,7 @@ Calling the API for Asteroid-NEOs from the wrapper function using sample start a
 
 When the API returns the data, the useful data is converted to a tibble and is showed below. I have also called the summary function to get an overview of the data.
 
-```{r eda_cme, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE}
 
 astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2020-01-01')$data
 
