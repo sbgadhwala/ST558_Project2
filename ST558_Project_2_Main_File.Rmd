@@ -31,6 +31,8 @@ library(ggpubr)
 library(jpeg)
 library(lubridate)
 library(GGally)
+library(corrplot)
+
 ```
 
 # Asteroid - NeoWs
@@ -348,10 +350,15 @@ plot1 <- ggplot(astDf, aes(x = Approach_Date, y = Miss_Distance))
 plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
   theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())+
   theme(axis.text.y = element_blank(), 
-        axis.ticks.y = element_blank()
-        )
+        axis.ticks.y = element_blank()) +
+  labs(title = 'Point Plot',
+      subtitle = "Miss Distance For Date Range")
 
 ```
+In th point plot, I have tried to visualize the count for Miss Distance for a give n date range with diameter as a size and if that particular asteroid is hazardous or not. Few key finding from the plots:  
+1. Most of the asteroids are categorized as a non hazardous for a given date range  
+2. All bigger asteroid (large diameter) are in upper part of the plot  
+
 
 ```{r, fig.width= 9 , fig.height=6}
 
@@ -364,21 +371,32 @@ plot2 +
   geom_boxplot() + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid), position = 'jitter') + 
   labs('Box Plot for Minimum Diameter') + 
   xlab('If Asteroid Hazardous ') + 
-  ylab('Minimum Diamter')
+  ylab('Minimum Diamter') + 
+  labs(title = "Box Plot",
+       subtitle = "Minimum Diamter Variation Across Asteroid Type ")
 
 ```
+
+The dark line in box plot represent the median and the top box is 75%ile and bottom box is 25 %ile. The end points of the black line are whiskers and they are at a distance of 1.5*IQR. In this plot we can visualize that the median diameter of potentially hazardous asteroid is hgher than the non hazardous asteroid. From the plot, we can also visualize few extreme points (>1.5IQR).  
 
 ```{r, fig.width= 9 , fig.height=10, message  =FALSE, warning=FALSE}
 
-library(ggplot2)
 
-# correlation plot
-numericalDf <- astDf [, c(1,2,3,4,6)]  
 
-ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
-        color = 'Is_Potentially_Hazardous_Asteroid')
+corr <- cor(numericalDf, method = "spearman")
+
+# Plot
+corrplot(corr, hc.order = TRUE, 
+           type = "lower", 
+           tl.pos = "lt",
+         title = "Correlation Plot",
+         subtitle = "Correlation Coefficient for Asteroid Data"
+)
+
 
 ```
+
+Correlation plot gives the relation among parameters, i.e is there any increase or decrease in a parameter directly affecting other parameter. From this correlation plot of asteroid data we can estimate that almost all parameters have a weak positive correlation coefficient.Magnitude and Relative velocity has a strong negative correlation coefficient, which needs to be taken care (adding interaction terms) in a model building.
 
 ```{r, fig.width=9, fig.height=6}
 # creating a new factor for relative speed
@@ -613,11 +631,14 @@ ggplot(cmeSampleData %>% group_by(numyear) %>% mutate(count = n()), aes(x=numyea
   geom_histogram(aes(fill=type), stat="count") + 
   scale_fill_discrete(name = "Type") + 
   labs(title="Histogram showing count of CME events in each year \nthat occurred between the given dates.",
-        x ="Month", y = "Count of CME events")
+        x ="Year", y = "Count of CME events")
 
 ```
 
 # Ending Remarks
 
 To summarize this vignette, we have built a wrapper function that would take the API of user's choice as input. Further two helper functions are also created to support the called API.
-Coronal Mass Ejection (CME) Analysis, helps get the data of coronal mass ejection events between two date ranges, and will have characteristics of the speed and half angle as defined by the user. Following up on the date retrieved after the API call, we have done the Exploratory Data Analysis to get some hidden and valuable insights of the data.
+Coronal Mass Ejection (CME) Analysis helps get the data of coronal mass ejection events between two date ranges, and will have characteristics  of the speed and half angle as defined by the user. 
+In similar fashion asteroid API helps in retrieving data pertaining to near earth objects like asteroid and comets. Following up on the date retrieved after the API call, we have done the Exploratory Data Analysis to get some hidden and valuable insights from the data.
+
+
