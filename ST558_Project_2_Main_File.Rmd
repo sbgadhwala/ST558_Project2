@@ -7,24 +7,19 @@ output:
     
 ---
 
-This vignette is based on the NASA API. The primary purpose of this vignette is to download data from the API and explore visualization package ggplot for exploratory data analysis purpose. 
+This vignette is based on demonstrating how to interact with the NASA APIs. Two of the NASA's APIs have been used for this project, namely Asteroid-NeoWs API and Coronal Mass Ejection Analysis API. The primary purpose of the functions used in this vignette is to call an end point of the API, download data from the API and explore visualization package ggplot2 for exploratory data analysis of the fetched data to gain valuable insights. 
 
 [NASA API](https://api.nasa.gov/index.html)
 
 # Requirement
 
-For this project following packages are used.
+Few of the essential packages used for this project are:
 
 [httr](https://httr.r-lib.org/) to provide a wrapper function and customized to the demand of modern web APIs.
-
 [jsonlite](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) to provide flexibility in mapping json and R data
-
 [lubridate](https://lubridate.tidyverse.org/) to manipulate date and time
-
 [ggplot](https://ggplot2.tidyverse.org/) used for creating graphics
-
 [tidyverse](https://www.tidyverse.org/) for data analysis purpose
-
 
 ```{r, warning=FALSE, message=FALSE}
 library(httr)
@@ -38,23 +33,21 @@ library(lubridate)
 library(GGally)
 ```
 
-# Asteroid - NeoWs API
+# Asteroid - NeoWs
 
 NeoWs (Near Earth object Web Service) is a REST API for near earth Asteroid information. Near Earth Objects (NEOs) are comets and asteroids and due to the gravitational attraction of nearby planet they enter into earth gravitational orbit
 
+## Asteroid - NeoWs API
+
 This API has near earth objects (NEO) tracking and the data set has 99% asteroids and only 1% comet data. 
 
-Parameter information:
+This API offers the following modifications:  
 
-Magnitude (H): Asteroid absolute magnitude (in general, smaller H implies larger asteroid diameter). This parameter is undefined for comets.
-
-Close-Approach (CA) Date : Date (TBD) of closest Earth approach.
-
-V Relative : Object velocity relative to the earth
-
-Maximum_Diameter (miles): Estimated maximum diameter in miles
-
-Minimum_Diameter (miles): Estimated minimum diameter in miles
+1.  Magnitude (H): Asteroid absolute magnitude (in general, smaller H implies larger asteroid diameter). This parameter is undefined for comets.
+2.  Close-Approach (CA) Date : Date (TBD) of closest Earth approach.
+3.  V Relative : Object velocity relative to the earth
+4.  Maximum_Diameter (miles): Estimated maximum diameter in miles
+5.  Minimum_Diameter (miles): Estimated minimum diameter in miles
 
 
 ```{r irs, warning=FALSE, message=FALSE}
@@ -187,22 +180,22 @@ This api is a part of Space Weather Database of Notifications, Knowledge, Inform
 [Coronal Mass Ejection (CME)](https://api.nasa.gov/index.html#donkiCMEAnalysis)
 
 Some of the modifications offered in this API are:  
-*  Start Date: Desired starting date from which the data wants to be collected (default value is 30 days prior to current UTC time)
-*  End Date: Desired ending date till when the data wants to be collected (default value is current UTC time)
-*  Most Accurate Only (default set to True)
-*  Complete Entry Only (default set to True)
-*  Speed (lower limit): Speed of the coronal mass ejection event (default set to 0)
-*  Half Angle (lower limit): the angle of the coronal mass ejection event with respect to vertical axis (default set to 0)
-*  Catalog (default set to ALL)
-*  Keyword (default set to NONE)
+1.  Start Date: Desired starting date from which the data wants to be collected (default value is 30 days prior to current UTC time)  
+2.  End Date: Desired ending date till when the data wants to be collected (default value is current UTC time  
+3.  Most Accurate Only (default set to True)  
+4.  Complete Entry Only (default set to True)  
+5.  Speed (lower limit): Speed of the coronal mass ejection event (default set to 0)  
+6.  Half Angle (lower limit): the angle of the coronal mass ejection event with respect to vertical axis (default set to 0)  
+7.  Catalog (default set to ALL)  
+8.  Keyword (default set to NONE)
 
-In this vignette, we have focused on the main 4 modifications,
-*  Start Date
-*  End Date
-*  Speed
-*  Half Angle
+In this vignette, we have focused on the main 4 modifications,  
+1.  Start Date  
+2.  End Date  
+3.  Speed  
+4.  Half Angle
 
-## Function to get the CME data:  
+## Helper function to get the CME data:  
 
 This is a helper function that will call the API endpoint according to the modification values. This function takes the above mentioned 4 modifications as input; the start date, the end date, minimum speed, and minimum half angle.  
 
@@ -210,13 +203,13 @@ The start date and end date are mandatory for any user to enter, while speed and
 
 To make the API function more rigid, I have implemented many checks that includes the start and end date format check, speed and half angle values and data type check, and throw warnings and errors accordingly. If the input data is correct then the modification values are appended to the base URL of the API, which is called  and a JSON is returned as a result which will have the details of the CME event between the two dates having mentioned speed and half angle characteristics.
 
-The data from the JSON extracted here are:
-*  time: Time of the CME event
-*  latitude: The latitude value of the coordinate where the CME event took place
-*  longitude: The longitude value of the coordinate where the CME event took place
-*  halfAngle: The half angle value of the trajectory of the explosion
-*  speed: The speed of the explosion
-*  type: Type of events (classifications include "C", "O", "R", "S")
+The data from the JSON extracted here are:  
+1.  time: Time of the CME event  
+2.  latitude: The latitude value of the coordinate where the CME event took place  
+3.  longitude: The longitude value of the coordinate where the CME event took place  
+4.  halfAngle: The half angle value of the trajectory of the explosion  
+5.  speed: The speed of the explosion  
+6.  type: Type of events (classifications include "C", "O", "R", "S")
 
 A tibble is created with the above stated details and is returned from the function along with the URL that was formed from the input values for modifications.
 
@@ -287,12 +280,12 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 
 # Parent Wrapper Function
 
-The following the is the main parent wrapper function. This function takes the following input:  
-*  api: The API that the user is interested in calling (Coronal Mass Ejection (CME) Analysis or Asteroids - NeoWs)
+The following the is the main parent wrapper function. This function takes the following input:    
+1.  api: The API that the user is interested in calling (Coronal Mass Ejection (CME) Analysis or Asteroids - NeoWs)
 
 For this, the user can either give the abbreviated or the full name of the api, either will lead to the same call of the designated API.
-
-*  ...: This takes the additional input for particular APIs. For Coronal Mass Ejection (CME) Analysis API, it will read the start date, end date, speed and half angle. For Asteroids - NeoWs, it will read the start date and end date.
+  
+2.  ...: This takes the additional input for particular APIs. For Coronal Mass Ejection (CME) Analysis API, it will read the start date, end date, speed and half angle. For Asteroids - NeoWs, it will read the start date and end date.
 
 Note: If any API other than the above mentioned two is called, an error message will be thrown stating that this API is not yet supported. 
 
@@ -315,7 +308,7 @@ apiSelection <- function(api, ...){
 
 ```
 
-# Exploratory Data Analysis for Asteroid Data
+# Exploratory Data Analysis for Asteroid - NeoWs API Data
 
 Calling the API for Asteroid-NEOs from the wrapper function using sample start and end date. Here I have selected start date as 2017-01-01, and the end date as 2020-01-01.
 
@@ -371,7 +364,7 @@ ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
 ```
 
 
-# Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API.
+# Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API Data.
 
 Calling the API for CME from the wrapper function using some sample start and end date. Here I have selected start date as 2017-01-01, and the end date as 2020-01-01. The speed and half angle are kept as default that is 0.
 
@@ -414,10 +407,10 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude")
 ```
 
-To gain more insights about the data, I have segregated the speed, location, and half angle from the data.  
-*  The speed has 4 classifications; Slow Paced, Medium Paced, Fast Paced and Hyper Paced.
-*  Location is divided into 4 zones based on their latitude and longitude; North-East, North-West, South-East and South-West.
-*  Half Angles are classified into 3 categories; low, medium and high
+To gain more insights about the data, I have segregated the speed, location, and half angle from the data.    
+1. The speed has 4 classifications; Slow Paced, Medium Paced, Fast Paced and Hyper Paced.  
+2.  Location is divided into 4 zones based on their latitude and longitude; North-East, North-West, South-East and South-West.  
+3.  Half Angles are classified into 3 categories; low, medium and high
 
 After adding these classified variables, I am again printing the data.
 
@@ -535,7 +528,7 @@ ggplot(cmeSampleData, aes(x = type)) +
 
 Lastly, I took the dates (time-stamp) of events, and extracted months from them, and plotted a histogram the count of CME events occurring in each month between the given input start and end dates, classified into the type of events on the histograms bins.
 
-```{r hist}
+```{r hist, message=FALSE, warning=FALSE}
 dates = c()
 for (i in 1:nrow(cmeSampleData)){
   dates <- append(dates, strsplit(cmeSampleData$time[i], split="T")[[1]][1])
