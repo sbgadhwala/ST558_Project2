@@ -1,5 +1,5 @@
 ---
-title: "ST558 Project 2 - NASA API"
+title: "ST558 Project 2 - NASA APIs"
 author: "Shyam Gadhwala & Kamlesh Pandey"
 output: 
   github_document:
@@ -589,3 +589,6 @@ ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
   labs(title="Histogram showing count of CME events in month \nthat occurred between the given dates.",
         x ="Month", y = "Count of CME events")
 ```
+
+# Ending Remarks
+
