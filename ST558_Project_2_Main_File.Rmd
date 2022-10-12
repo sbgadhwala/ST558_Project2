@@ -161,7 +161,7 @@ asteroidData <- function(start_date, end_date, ...){
   
       }
   }
-  final tibble#
+  #final tibble
   aesData <- tibble('Magnitude' = magnitude, 
                     'Minimum_Diameter' = dMin, 
                     'Maximum_Diameter' = dMax, 
