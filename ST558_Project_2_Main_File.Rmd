@@ -1,5 +1,5 @@
 ---
-title: "ST558 Project 2"
+title: "ST558 Project 2 - NASA API"
 author: "Shyam Gadhwala & Kamlesh Pandey"
 output: 
   github_document:
@@ -7,19 +7,19 @@ output:
     
 ---
 
+# Introduction  
+
 This vignette is based on demonstrating how to interact with the NASA APIs. Two of the NASA's APIs have been used for this project, namely Asteroid-NeoWs API and Coronal Mass Ejection Analysis API. The primary purpose of the functions used in this vignette is to call an end point of the API, download data from the API and explore visualization package ggplot2 for exploratory data analysis of the fetched data to gain valuable insights. 
 
-[NASA API](https://api.nasa.gov/index.html)
-
-# Requirement
+[NASA API Link](https://api.nasa.gov/index.html)
 
 Few of the essential packages used for this project are:
 
-[httr](https://httr.r-lib.org/) to provide a wrapper function and customized to the demand of modern web APIs.
+[httr](https://httr.r-lib.org/)to provide a wrapper function and customized to the demand of modern web APIs.
 [jsonlite](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) to provide flexibility in mapping json and R data
-[lubridate](https://lubridate.tidyverse.org/) to manipulate date and time
-[ggplot](https://ggplot2.tidyverse.org/) used for creating graphics
-[tidyverse](https://www.tidyverse.org/) for data analysis purpose
+[lubridate](https://lubridate.tidyverse.org/)to manipulate date and time
+[ggplot](https://ggplot2.tidyverse.org/)used for creating graphics
+[tidyverse](https://www.tidyverse.org/)for data analysis purpose
 
 ```{r, warning=FALSE, message=FALSE}
 library(httr)
@@ -43,11 +43,27 @@ This API has near earth objects (NEO) tracking and the data set has 99% asteroid
 
 This API offers the following modifications:  
 
-1.  Magnitude (H): Asteroid absolute magnitude (in general, smaller H implies larger asteroid diameter). This parameter is undefined for comets.
+1.  Magnitude (H): Asteroid absolute magnitude is the visual magnitude a observer would record if asteroid is place 1AU away from the sun
 2.  Close-Approach (CA) Date : Date (TBD) of closest Earth approach.
 3.  V Relative : Object velocity relative to the earth
 4.  Maximum_Diameter (miles): Estimated maximum diameter in miles
 5.  Minimum_Diameter (miles): Estimated minimum diameter in miles
+
+## Helper function to get the Asteroid NeoWs data:  
+
+This function will call the API with desired modification. This API has start and end date as modifications. User can provide a date range for the API and by GET request we can retrieve the data. 
+The start and end date are mandatory input without any default argument.  
+This helper function has multiple checks for correct format for start and end date. In case of correct input dates, the modification will be added to the API and respective data is generated.
+
+The data columns extracted from the APIs are as follow:
+1. Magnitude  
+2. Minimum Diameter(miles)  
+3. Maximum Diameter(miles)  
+4. Relative Velocity  
+5. Approach Date  
+6. Miss Distance (AU)  
+7. Orbiting Body
+2. IS Asteroid Potentially hazardous 
 
 
 ```{r irs, warning=FALSE, message=FALSE}
@@ -84,7 +100,7 @@ asteroidData <- function(start_date, end_date, ...){
     # check if end_date > start_date, if true stop the program
     if (ymd(end_date) < ymd(start_date)){
       message <- paste('End date' , end_date, 'should be greater than the start date', start_date)
-      stop(message())
+      stop(message)
       
       } 
     # if dates are in correct format then execute the code
@@ -96,7 +112,6 @@ asteroidData <- function(start_date, end_date, ...){
         if (diffDate > 8){
           message <- paste('[WARNING..!!] The difference between the date range should be less than 8 days', 
                            'for this current date range the API will return future Approach date ')
-          print(message)
         }
         
         # API Parameters      
@@ -138,9 +153,7 @@ asteroidData <- function(start_date, end_date, ...){
             orbit <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$orbiting_body
             # storing in a temporary factor
             tempOrbit <- append(tempOrbit, orbit)
-            
           }
-          
           missDist <- append(missDist, as.numeric(tempDist))
           Date <- append(Date, tempDate)
           velocity <-append(velocity, as.numeric(tempVel))
@@ -151,7 +164,6 @@ asteroidData <- function(start_date, end_date, ...){
           isHazard <- append(isHazard, isHazard_)
           
   }
-  
       }
   }
   #final tibble
@@ -164,7 +176,7 @@ asteroidData <- function(start_date, end_date, ...){
                     'Orbiting_Body' = orbitBody,
                     'Is_Potentially_Hazardous_Asteroid' = isHazard)
 
-# This function will return the URL of the API and the dataset generated
+# This function will return the URL of the API and the data set generated
 return (list(url = url, data = aesData))
 }
 ```
@@ -310,19 +322,19 @@ apiSelection <- function(api, ...){
 
 # Exploratory Data Analysis for Asteroid - NeoWs API Data
 
-Calling the API for Asteroid-NEOs from the wrapper function using sample start and end date. Here I have selected start date as 2017-01-01, and the end date as 2020-01-01.
+Calling the API for Asteroid-NEOs from the wrapper function using sample start and end date. Here I have selected start date as 2017-01-01, and the end date as 2017-08-01.
 
-When the API returns the data, the useful data is converted to a tibble and is showed below. I have also called the summary function to get an overview of the data.
+When the API returns the data, the useful data is converted to a tibble and is showed below. I have also called the summary function to get an overview of numerical feature columns.
 
 ```{r, message=FALSE, warning=FALSE}
 
-astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2020-01-01')$data
+astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2017-08-01')$data
 
 summary(astDf %>% select(Magnitude:Miss_Distance))
 
 ```
 
-```{r, fig.width= 12 , fig.height=6}
+```{r, fig.width= 9 , fig.height=6}
 
 # EDA on Asteroid data
 
@@ -336,7 +348,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
 
 ```
 
-```{r, fig.width= 12 , fig.height=6}
+```{r, fig.width= 9 , fig.height=6}
 
 # boxplot for min and max diamter
 
@@ -351,7 +363,7 @@ plot2 +
 
 ```
 
-```{r, fig.width= 12 , fig.height=10, message  =FALSE, warning=FALSE}
+```{r, fig.width= 9 , fig.height=10, message  =FALSE, warning=FALSE}
 
 library(ggplot2)
 
@@ -363,6 +375,25 @@ ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
 
 ```
 
+```{r, fig.width=9, fig.height=12}
+# creating a new factor for relative speed
+speedClassfication <- c("Low Speed Asteroid", "Medium Speed Asteroid", "High Speed Asteroid" )
+astDf <- astDf %>%
+  mutate(speedBin = factor(if_else(Relative_Velocity<37000, speedClassfication[1],
+                                   if_else(Relative_Velocity<66000, speedClassfication[2],
+                           speedClassfication[3]))))
+# plot
+plot3 <- ggplot(astDf, aes(x = Orbiting_Body, fill = Is_Potentially_Hazardous_Asteroid))
+
+plot3 + geom_bar(stat = 'count', position = position_dodge()) +
+        facet_grid(cols = vars(speedBin), 
+                   labeller = label_both) +                          # 
+                    theme(axis.text.x = element_text(angle = 45), 
+                          legend.title = element_blank()) +
+        xlab('Orbiting Body') +
+        labs(title = "Facet Plot for Relative Velocity Count ")
+        
+```
 
 # Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API Data.
 
