@@ -62,14 +62,17 @@ asteroidData <- function(start_date, end_date, ...){
   baseURL <- 'https://api.nasa.gov/neo/rest/v1/'
   apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
   endpoint <- 'feed'
+  
+  # URL for GET request
   url <- paste0(baseURL, endpoint, '?startDate=', start_date, '&endDate=', end_date,'&api_key=', apiKey)
   
   res <- GET(url)
   asteroidData <- fromJSON(rawToChar(res$content))
   
-  # check for date format
+  # desired date format to query from the API
   dateFormat <- "%Y-%m-%d"
   
+  # check if if the start and end date are in YYYY-MM-DD format
   checkStart <- tryCatch(!is.na(as.Date(start_date, dateFormat)), 
              error = function(err) 
              {TRUE})
@@ -78,31 +81,31 @@ asteroidData <- function(start_date, end_date, ...){
              error = function(err) 
              {TRUE})
   
-  # First Check for date format
+  # check for the correct date format
   if (checkStart == FALSE | checkEnd == FALSE){
     message <- paste('[ERROR..!!] Either your start or end date is not is correct YYYY-MM-DD format')
-    print(message)
     stop(message)
   }
+  # if both date format start and end are in correct format
   else if(checkStart == TRUE & checkEnd == TRUE){
-    #check if end_date > start_date
+    
+    #if correct format, check if end_date > start_date
     if (ymd(end_date) < ymd(start_date)){
       message <- paste('End date' , end_date, 'should be greater than the start date', start_date)
-      print(message)
       stop(message())
       
-      } else if (ymd(end_date) > ymd(start_date)){
-        
-        # check for the diff between the start and end date
+    } 
+      # if end date is greater than the start date
+      else if (ymd(end_date) > ymd(start_date)){
+        # calculate the difference between the start and end date in days
         diffDate <- difftime(ymd(end_date), ymd(start_date), units = 'days')
         
         if (diffDate > 8){
           message <- paste('[WARNING..!!] The difference between the date range should be less than 8 days', 
                            'for this current date range the API will return future Approach date ')
-          print(message)
         }
         
-  # API Parameters      
+        # API Parameters      
         magnitude <- c()
         dMin  <- c()
         dMax <- c()
@@ -123,19 +126,28 @@ asteroidData <- function(start_date, end_date, ...){
           tempDist <- c()
           tempOrbit <- c()
           
-          # for close approach
+          # for other nested dictionary
           for (j in 1:length(asteroidData$near_earth_objects[[i]]$close_approach_data)){
+            # get the relative velocity
             vel <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$relative_velocity$kilometers_per_hour
+            # store the velocity in temporary variable
             tempVel <- append(tempVel, vel)
+            # get the approach date from the API
             date <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$close_approach_date
+            # store approach date in a temporary variable
             tempDate <- append(tempDate, date)
+            # get the distance in AU
             dist <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$miss_distance$astronomical
+            # store the distance in temporary variable
             tempDist <- append(tempDist, dist)
+            # get the orbiting body
             orbit <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$orbiting_body
+            # store the orbiting data in temporary variable
             tempOrbit <- append(tempOrbit, orbit)
             
           }
           
+          # Append the variables into the corresponding main variable
           missDist <- append(missDist, as.numeric(tempDist))
           Date <- append(Date, tempDate)
           velocity <-append(velocity, as.numeric(tempVel))
@@ -144,11 +156,11 @@ asteroidData <- function(start_date, end_date, ...){
           dMax <- append(dMax, dMax_)
           orbitBody <- append(orbitBody, tempOrbit)
           isHazard <- append(isHazard, isHazard_)
-          
   }
   
       }
   }
+  # create a data frame with correct feature name
   aesData <- tibble('Magnitude' = magnitude, 
                     'Minimum_Diameter' = dMin, 
                     'Maximum_Diameter' = dMax, 
@@ -181,7 +193,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
 
 ```{r, fig.width= 12 , fig.height=6}
 
-# boxplot for min and max diamter
+# boxplot for min and max diameter
 
 par(mfrow = c(1,2))
 plot2 <- ggplot(astDf, aes(x = Is_Potentially_Hazardous_Asteroid,  y = Minimum_Diameter))
@@ -198,9 +210,14 @@ plot2 +
 
 library(ggplot2)
 
-# correlation plot
+#storing only numerical feature column for correlation plot
+numericalDf <- astDf[, c(1,2,3,4,6)]
 
-ggpairs(astDf, color = 'red', main = 'Scatter Plot')
+# correlation plot
+ggpairs(numericalDf, main = 'Scatter Plot', 
+        upper = "blank",
+        legends = T,
+        color = 'Is_Potentially_Hazardous_Asteroid')
 
 ```
 
@@ -263,7 +280,7 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 ```
 
 
-
+# change cmeSampleData to cmeDf
 ```{r eda_cme, message=FALSE, warning=FALSE}
 cmeSampleData <- cmeData("2017-01-01", "2020-01-01")$data
 
