@@ -1,43 +1,46 @@
-ST558 Project 2
+ST558 Project 2 - NASA API
 ================
 Shyam Gadhwala & Kamlesh Pandey
 
--   [Requirement](#requirement)
--   [Asteroid - NeoWs API](#asteroid---neows-api)
+-   [Introduction](#introduction)
+-   [Asteroid - NeoWs](#asteroid---neows)
+    -   [Asteroid - NeoWs API](#asteroid---neows-api)
+    -   [Helper function to get the Asteroid NeoWs
+        data:](#helper-function-to-get-the-asteroid-neows-data)
 -   [Coronal Mass Ejection (CME)
     Analysis](#coronal-mass-ejection-cme-analysis)
     -   [Coronal Mass Ejection (CME) Analysis
         API:](#coronal-mass-ejection-cme-analysis-api)
-    -   [Function to get the CME data:](#function-to-get-the-cme-data)
+    -   [Helper function to get the CME
+        data:](#helper-function-to-get-the-cme-data)
 -   [Parent Wrapper Function](#parent-wrapper-function)
--   [Exploratory Data Analysis for Asteroid
-    Data](#exploratory-data-analysis-for-asteroid-data)
+-   [Exploratory Data Analysis for Asteroid - NeoWs API
+    Data](#exploratory-data-analysis-for-asteroid---neows-api-data)
 -   [Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME)
-    Analysis
-    API.](#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api)
+    Analysis API
+    Data.](#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data)
 
-This vignette is based on the NASA API. The primary purpose of this
-vignette is to download data from the API and explore visualization
-package ggplot for exploratory data analysis purpose.
+# Introduction
 
-[NASA API](https://api.nasa.gov/index.html)
+This vignette is based on demonstrating how to interact with the NASA
+APIs. Two of the NASA’s APIs have been used for this project, namely
+Asteroid-NeoWs API and Coronal Mass Ejection Analysis API. The primary
+purpose of the functions used in this vignette is to call an end point
+of the API, download data from the API and explore visualization package
+ggplot2 for exploratory data analysis of the fetched data to gain
+valuable insights.
 
-# Requirement
+[NASA API Link](https://api.nasa.gov/index.html)
 
-For this project following packages are used.
+Few of the essential packages used for this project are:
 
-[httr](https://httr.r-lib.org/) to provide a wrapper function and
+[httr](https://httr.r-lib.org/)to provide a wrapper function and
 customized to the demand of modern web APIs.
-
 [jsonlite](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html)
 to provide flexibility in mapping json and R data
-
-[lubridate](https://lubridate.tidyverse.org/) to manipulate date and
-time
-
-[ggplot](https://ggplot2.tidyverse.org/) used for creating graphics
-
-[tidyverse](https://www.tidyverse.org/) for data analysis purpose
+[lubridate](https://lubridate.tidyverse.org/)to manipulate date and time
+[ggplot](https://ggplot2.tidyverse.org/)used for creating graphics
+[tidyverse](https://www.tidyverse.org/)for data analysis purpose
 
 ``` r
 library(httr)
@@ -51,29 +54,44 @@ library(lubridate)
 library(GGally)
 ```
 
-# Asteroid - NeoWs API
+# Asteroid - NeoWs
 
 NeoWs (Near Earth object Web Service) is a REST API for near earth
 Asteroid information. Near Earth Objects (NEOs) are comets and asteroids
 and due to the gravitational attraction of nearby planet they enter into
 earth gravitational orbit
 
+## Asteroid - NeoWs API
+
 This API has near earth objects (NEO) tracking and the data set has 99%
 asteroids and only 1% comet data.
 
-Parameter information:
+This API offers the following modifications:
 
-Magnitude (H): Asteroid absolute magnitude (in general, smaller H
-implies larger asteroid diameter). This parameter is undefined for
-comets.
+1.  Magnitude (H): Asteroid absolute magnitude is the visual magnitude a
+    observer would record if asteroid is place 1AU away from the sun
+2.  Close-Approach (CA) Date : Date (TBD) of closest Earth approach.
+3.  V Relative : Object velocity relative to the earth
+4.  Maximum_Diameter (miles): Estimated maximum diameter in miles
+5.  Minimum_Diameter (miles): Estimated minimum diameter in miles
 
-Close-Approach (CA) Date : Date (TBD) of closest Earth approach.
+## Helper function to get the Asteroid NeoWs data:
 
-V Relative : Object velocity relative to the earth
+This function will call the API with desired modification. This API has
+start and end date as modifications. User can provide a date range for
+the API and by GET request we can retrieve the data. The start and end
+date are mandatory input without any default argument.  
+This helper function has multiple checks for correct format for start
+and end date. In case of correct input dates, the modification will be
+added to the API and respective data is generated.
 
-Maximum_Diameter (miles): Estimated maximum diameter in miles
-
-Minimum_Diameter (miles): Estimated minimum diameter in miles
+The data columns extracted from the APIs are as follow: 1. Magnitude  
+2. Minimum Diameter(miles)  
+3. Maximum Diameter(miles)  
+4. Relative Velocity  
+5. Approach Date  
+6. Miss Distance (AU)  
+7. Orbiting Body 2. IS Asteroid Potentially hazardous
 
 ``` r
 asteroidData <- function(start_date, end_date, ...){
@@ -108,7 +126,7 @@ asteroidData <- function(start_date, end_date, ...){
     # check if end_date > start_date, if true stop the program
     if (ymd(end_date) < ymd(start_date)){
       message <- paste('End date' , end_date, 'should be greater than the start date', start_date)
-      stop(message())
+      stop(message)
       
       } 
     # if dates are in correct format then execute the code
@@ -120,7 +138,6 @@ asteroidData <- function(start_date, end_date, ...){
         if (diffDate > 8){
           message <- paste('[WARNING..!!] The difference between the date range should be less than 8 days', 
                            'for this current date range the API will return future Approach date ')
-          print(message)
         }
         
         # API Parameters      
@@ -162,9 +179,7 @@ asteroidData <- function(start_date, end_date, ...){
             orbit <- asteroidData$near_earth_objects[[i]]$close_approach_data[[j]]$orbiting_body
             # storing in a temporary factor
             tempOrbit <- append(tempOrbit, orbit)
-            
           }
-          
           missDist <- append(missDist, as.numeric(tempDist))
           Date <- append(Date, tempDate)
           velocity <-append(velocity, as.numeric(tempVel))
@@ -175,7 +190,6 @@ asteroidData <- function(start_date, end_date, ...){
           isHazard <- append(isHazard, isHazard_)
           
   }
-  
       }
   }
   #final tibble
@@ -188,7 +202,7 @@ asteroidData <- function(start_date, end_date, ...){
                     'Orbiting_Body' = orbitBody,
                     'Is_Potentially_Hazardous_Asteroid' = isHazard)
 
-# This function will return the URL of the API and the dataset generated
+# This function will return the URL of the API and the data set generated
 return (list(url = url, data = aesData))
 }
 ```
@@ -218,20 +232,26 @@ by NASA that helps with the data of such CME events:
 (CME)](https://api.nasa.gov/index.html#donkiCMEAnalysis)
 
 Some of the modifications offered in this API are:  
-\* Start Date: Desired starting date from which the data wants to be
-collected (default value is 30 days prior to current UTC time) \* End
-Date: Desired ending date till when the data wants to be collected
-(default value is current UTC time) \* Most Accurate Only (default set
-to True) \* Complete Entry Only (default set to True) \* Speed (lower
-limit): Speed of the coronal mass ejection event (default set to 0) \*
-Half Angle (lower limit): the angle of the coronal mass ejection event
-with respect to vertical axis (default set to 0) \* Catalog (default set
-to ALL) \* Keyword (default set to NONE)
+1. Start Date: Desired starting date from which the data wants to be
+collected (default value is 30 days prior to current UTC time)  
+2. End Date: Desired ending date till when the data wants to be
+collected (default value is current UTC time  
+3. Most Accurate Only (default set to True)  
+4. Complete Entry Only (default set to True)  
+5. Speed (lower limit): Speed of the coronal mass ejection event
+(default set to 0)  
+6. Half Angle (lower limit): the angle of the coronal mass ejection
+event with respect to vertical axis (default set to 0)  
+7. Catalog (default set to ALL)  
+8. Keyword (default set to NONE)
 
-In this vignette, we have focused on the main 4 modifications, \* Start
-Date \* End Date \* Speed \* Half Angle
+In this vignette, we have focused on the main 4 modifications,  
+1. Start Date  
+2. End Date  
+3. Speed  
+4. Half Angle
 
-## Function to get the CME data:
+## Helper function to get the CME data:
 
 This is a helper function that will call the API endpoint according to
 the modification values. This function takes the above mentioned 4
@@ -250,12 +270,15 @@ to the base URL of the API, which is called and a JSON is returned as a
 result which will have the details of the CME event between the two
 dates having mentioned speed and half angle characteristics.
 
-The data from the JSON extracted here are: \* time: Time of the CME
-event \* latitude: The latitude value of the coordinate where the CME
-event took place \* longitude: The longitude value of the coordinate
-where the CME event took place \* halfAngle: The half angle value of the
-trajectory of the explosion \* speed: The speed of the explosion \*
-type: Type of events (classifications include “C”, “O”, “R”, “S”)
+The data from the JSON extracted here are:  
+1. time: Time of the CME event  
+2. latitude: The latitude value of the coordinate where the CME event
+took place  
+3. longitude: The longitude value of the coordinate where the CME event
+took place  
+4. halfAngle: The half angle value of the trajectory of the explosion  
+5. speed: The speed of the explosion  
+6. type: Type of events (classifications include “C”, “O”, “R”, “S”)
 
 A tibble is created with the above stated details and is returned from
 the function along with the URL that was formed from the input values
@@ -327,13 +350,13 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
 
 The following the is the main parent wrapper function. This function
 takes the following input:  
-\* api: The API that the user is interested in calling (Coronal Mass
+1. api: The API that the user is interested in calling (Coronal Mass
 Ejection (CME) Analysis or Asteroids - NeoWs)
 
 For this, the user can either give the abbreviated or the full name of
 the api, either will lead to the same call of the designated API.
 
--   …: This takes the additional input for particular APIs. For Coronal
+2.  …: This takes the additional input for particular APIs. For Coronal
     Mass Ejection (CME) Analysis API, it will read the start date, end
     date, speed and half angle. For Asteroids - NeoWs, it will read the
     start date and end date.
@@ -359,47 +382,64 @@ apiSelection <- function(api, ...){
 }
 ```
 
-# Exploratory Data Analysis for Asteroid Data
+# Exploratory Data Analysis for Asteroid - NeoWs API Data
 
 Calling the API for Asteroid-NEOs from the wrapper function using sample
 start and end date. Here I have selected start date as 2017-01-01, and
-the end date as 2020-01-01.
+the end date as 2017-08-01.
 
 When the API returns the data, the useful data is converted to a tibble
 and is showed below. I have also called the summary function to get an
-overview of the data.
+overview of numerical feature columns.
 
 ``` r
-astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2020-01-01')$data
-```
+astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2017-08-01')$data
 
-    ## [1] "[WARNING..!!] The difference between the date range should be less than 8 days for this current date range the API will return future Approach date "
-
-``` r
 summary(astDf %>% select(Magnitude:Miss_Distance))
 ```
 
-    ##    Magnitude     Minimum_Diameter  
-    ##  Min.   :15.25   Min.   :0.001896  
-    ##  1st Qu.:20.43   1st Qu.:0.020792  
-    ##  Median :21.57   Median :0.080150  
-    ##  Mean   :22.25   Mean   :0.133732  
-    ##  3rd Qu.:24.50   3rd Qu.:0.135490  
-    ##  Max.   :29.70   Max.   :1.471994  
-    ##  Maximum_Diameter  Relative_Velocity
-    ##  Min.   :0.00424   Min.   :  6882   
-    ##  1st Qu.:0.04649   1st Qu.: 37687   
-    ##  Median :0.17922   Median : 50262   
-    ##  Mean   :0.29903   Mean   : 52273   
-    ##  3rd Qu.:0.30296   3rd Qu.: 66063   
-    ##  Max.   :3.29148   Max.   :123714   
-    ##  Approach_Date      Miss_Distance     
-    ##  Length:73          Min.   :0.003582  
-    ##  Class :character   1st Qu.:0.193351  
-    ##  Mode  :character   Median :0.293841  
-    ##                     Mean   :0.284901  
-    ##                     3rd Qu.:0.390529  
-    ##                     Max.   :0.498633
+    ##    Magnitude    
+    ##  Min.   :15.25  
+    ##  1st Qu.:20.43  
+    ##  Median :21.57  
+    ##  Mean   :22.25  
+    ##  3rd Qu.:24.50  
+    ##  Max.   :29.70  
+    ##  Minimum_Diameter  
+    ##  Min.   :0.001896  
+    ##  1st Qu.:0.020792  
+    ##  Median :0.080150  
+    ##  Mean   :0.133732  
+    ##  3rd Qu.:0.135490  
+    ##  Max.   :1.471994  
+    ##  Maximum_Diameter 
+    ##  Min.   :0.00424  
+    ##  1st Qu.:0.04649  
+    ##  Median :0.17922  
+    ##  Mean   :0.29903  
+    ##  3rd Qu.:0.30296  
+    ##  Max.   :3.29148  
+    ##  Relative_Velocity
+    ##  Min.   :  6882   
+    ##  1st Qu.: 37687   
+    ##  Median : 50262   
+    ##  Mean   : 52273   
+    ##  3rd Qu.: 66063   
+    ##  Max.   :123714   
+    ##  Approach_Date     
+    ##  Length:73         
+    ##  Class :character  
+    ##  Mode  :character  
+    ##                    
+    ##                    
+    ##                    
+    ##  Miss_Distance     
+    ##  Min.   :0.003582  
+    ##  1st Qu.:0.193351  
+    ##  Median :0.293841  
+    ##  Mean   :0.284901  
+    ##  3rd Qu.:0.390529  
+    ##  Max.   :0.498633
 
 ``` r
 # EDA on Asteroid data
@@ -413,7 +453,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
         )
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 ``` r
 # boxplot for min and max diamter
@@ -428,7 +468,7 @@ plot2 +
   ylab('Minimum Diamter')
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 ``` r
 library(ggplot2)
@@ -440,9 +480,30 @@ ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
         color = 'Is_Potentially_Hazardous_Asteroid')
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
-# Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API.
+``` r
+# creating a new factor for relative speed
+speedClassfication <- c("Low Speed Asteroid", "Medium Speed Asteroid", "High Speed Asteroid" )
+astDf <- astDf %>%
+  mutate(speedBin = factor(if_else(Relative_Velocity<37000, speedClassfication[1],
+                                   if_else(Relative_Velocity<66000, speedClassfication[2],
+                           speedClassfication[3]))))
+# plot
+plot3 <- ggplot(astDf, aes(x = Orbiting_Body, fill = Is_Potentially_Hazardous_Asteroid))
+
+plot3 + geom_bar(stat = 'count', position = position_dodge()) +
+        facet_grid(cols = vars(speedBin), 
+                   labeller = label_both) +                          # 
+                    theme(axis.text.x = element_text(angle = 45), 
+                          legend.title = element_blank()) +
+        xlab('Orbiting Body') +
+        labs(title = "Facet Plot for Relative Velocity Count ")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+
+# Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API Data.
 
 Calling the API for CME from the wrapper function using some sample
 start and end date. Here I have selected start date as 2017-01-01, and
@@ -460,39 +521,55 @@ print(cmeSampleData)
 ```
 
     ## # A tibble: 324 x 6
-    ##    time    latitude longitude halfAngle
-    ##    <chr>      <dbl>     <dbl>     <dbl>
-    ##  1 2017-0~      -10      -105        20
-    ##  2 2017-0~      -33       -93        26
-    ##  3 2017-0~        3       100        22
-    ##  4 2017-0~        1       -90        36
-    ##  5 2017-0~       10      -155        10
-    ##  6 2017-0~       11        90        15
-    ##  7 2017-0~        0       -48        14
-    ##  8 2017-0~       11       160        11
-    ##  9 2017-0~       16       -80        21
-    ## 10 2017-0~       21       105        26
-    ## # ... with 314 more rows, and 2 more
-    ## #   variables: speed <dbl>, type <chr>
+    ##    time     latitude longitude
+    ##    <chr>       <dbl>     <dbl>
+    ##  1 2017-01~      -10      -105
+    ##  2 2017-01~      -33       -93
+    ##  3 2017-01~        3       100
+    ##  4 2017-01~        1       -90
+    ##  5 2017-01~       10      -155
+    ##  6 2017-01~       11        90
+    ##  7 2017-01~        0       -48
+    ##  8 2017-01~       11       160
+    ##  9 2017-01~       16       -80
+    ## 10 2017-01~       21       105
+    ## # ... with 314 more rows, and
+    ## #   3 more variables:
+    ## #   halfAngle <dbl>,
+    ## #   speed <dbl>, type <chr>
 
 ``` r
 summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude))
 ```
 
-    ##    halfAngle         speed       
-    ##  Min.   : 2.00   Min.   :  88.0  
-    ##  1st Qu.:16.00   1st Qu.: 281.5  
-    ##  Median :22.00   Median : 359.0  
-    ##  Mean   :22.27   Mean   : 413.9  
-    ##  3rd Qu.:27.00   3rd Qu.: 459.0  
-    ##  Max.   :54.00   Max.   :2650.0  
-    ##     latitude         longitude     
-    ##  Min.   :-55.000   Min.   :-178.0  
-    ##  1st Qu.: -7.000   1st Qu.: -88.0  
-    ##  Median :  0.000   Median :   1.5  
-    ##  Mean   :  2.506   Mean   :   2.5  
-    ##  3rd Qu.: 11.000   3rd Qu.:  92.0  
-    ##  Max.   : 90.000   Max.   : 178.0
+    ##    halfAngle    
+    ##  Min.   : 2.00  
+    ##  1st Qu.:16.00  
+    ##  Median :22.00  
+    ##  Mean   :22.27  
+    ##  3rd Qu.:27.00  
+    ##  Max.   :54.00  
+    ##      speed       
+    ##  Min.   :  88.0  
+    ##  1st Qu.: 281.5  
+    ##  Median : 359.0  
+    ##  Mean   : 413.9  
+    ##  3rd Qu.: 459.0  
+    ##  Max.   :2650.0  
+    ##     latitude      
+    ##  Min.   :-55.000  
+    ##  1st Qu.: -7.000  
+    ##  Median :  0.000  
+    ##  Mean   :  2.506  
+    ##  3rd Qu.: 11.000  
+    ##  Max.   : 90.000  
+    ##    longitude     
+    ##  Min.   :-178.0  
+    ##  1st Qu.: -88.0  
+    ##  Median :   1.5  
+    ##  Mean   :   2.5  
+    ##  3rd Qu.:  92.0  
+    ##  Max.   : 178.0
 
 To start with the initial EDA, using ggplot2 library, I have made a
 scatter plot representing the latitude and longitude of each of the CME
@@ -514,7 +591,7 @@ show(ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude"))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
 
 To see it more in respect to the actual sun’s corona layer, I have
 imported an image of sun and use it as a background to give a better
@@ -535,11 +612,11 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
 
 To gain more insights about the data, I have segregated the speed,
 location, and half angle from the data.  
-\* The speed has 4 classifications; Slow Paced, Medium Paced, Fast Paced
-and Hyper Paced. \* Location is divided into 4 zones based on their
-latitude and longitude; North-East, North-West, South-East and
-South-West. \* Half Angles are classified into 3 categories; low, medium
-and high
+1. The speed has 4 classifications; Slow Paced, Medium Paced, Fast Paced
+and Hyper Paced.  
+2. Location is divided into 4 zones based on their latitude and
+longitude; North-East, North-West, South-East and South-West.  
+3. Half Angles are classified into 3 categories; low, medium and high
 
 After adding these classified variables, I am again printing the data.
 
@@ -571,22 +648,24 @@ cmeSampleData
 ```
 
     ## # A tibble: 324 x 9
-    ##    time    latitude longitude halfAngle
-    ##    <chr>      <dbl>     <dbl>     <dbl>
-    ##  1 2017-0~      -10      -105        20
-    ##  2 2017-0~      -33       -93        26
-    ##  3 2017-0~        3       100        22
-    ##  4 2017-0~        1       -90        36
-    ##  5 2017-0~       10      -155        10
-    ##  6 2017-0~       11        90        15
-    ##  7 2017-0~        0       -48        14
-    ##  8 2017-0~       11       160        11
-    ##  9 2017-0~       16       -80        21
-    ## 10 2017-0~       21       105        26
-    ## # ... with 314 more rows, and 5 more
-    ## #   variables: speed <dbl>,
-    ## #   type <fct>, speedC <fct>,
-    ## #   zone <fct>, halfAngleC <fct>
+    ##    time     latitude longitude
+    ##    <chr>       <dbl>     <dbl>
+    ##  1 2017-01~      -10      -105
+    ##  2 2017-01~      -33       -93
+    ##  3 2017-01~        3       100
+    ##  4 2017-01~        1       -90
+    ##  5 2017-01~       10      -155
+    ##  6 2017-01~       11        90
+    ##  7 2017-01~        0       -48
+    ##  8 2017-01~       11       160
+    ##  9 2017-01~       16       -80
+    ## 10 2017-01~       21       105
+    ## # ... with 314 more rows, and
+    ## #   6 more variables:
+    ## #   halfAngle <dbl>,
+    ## #   speed <dbl>, type <fct>,
+    ## #   speedC <fct>, zone <fct>,
+    ## #   halfAngleC <fct>
 
 Then from the data, I have grouped the data by combining zone, speed and
 type of event, and for each group, I have calculated the number of
@@ -603,22 +682,24 @@ cmeSampleData %>%
 
     ## # A tibble: 11 x 8
     ## # Groups:   zone, speedC [11]
-    ##    zone   speedC type  avgSpeed sdSpeed
-    ##    <fct>  <fct>  <fct>    <dbl>   <dbl>
-    ##  1 North~ Mediu~ C         627.   100. 
-    ##  2 North~ Slow ~ S         325.    88.3
-    ##  3 North~ Fast ~ O        1177.    62.0
-    ##  4 North~ Hyper~ R        2460.   268. 
-    ##  5 North~ Mediu~ C         620.    82.6
-    ##  6 North~ Slow ~ S         326.    95.1
-    ##  7 South~ Mediu~ C         634.   126. 
-    ##  8 South~ Slow ~ S         313.    90.5
-    ##  9 South~ Fast ~ O        1437     32.0
-    ## 10 South~ Mediu~ C         691.   173. 
-    ## 11 South~ Slow ~ S         328.    81.7
-    ## # ... with 3 more variables:
+    ##    zone  speedC type  avgSpeed
+    ##    <fct> <fct>  <fct>    <dbl>
+    ##  1 Nort~ Mediu~ C         627.
+    ##  2 Nort~ Slow ~ S         325.
+    ##  3 Nort~ Fast ~ O        1177.
+    ##  4 Nort~ Hyper~ R        2460.
+    ##  5 Nort~ Mediu~ C         620.
+    ##  6 Nort~ Slow ~ S         326.
+    ##  7 Sout~ Mediu~ C         634.
+    ##  8 Sout~ Slow ~ S         313.
+    ##  9 Sout~ Fast ~ O        1437 
+    ## 10 Sout~ Mediu~ C         691.
+    ## 11 Sout~ Slow ~ S         328.
+    ## # ... with 4 more variables:
+    ## #   sdSpeed <dbl>,
     ## #   avgHalfAngle <dbl>,
-    ## #   sdHalfAngle <dbl>, count <int>
+    ## #   sdHalfAngle <dbl>,
+    ## #   count <int>
 
 Then contingency table is created for zone, speed and type of events,
 and is showed below.
@@ -630,62 +711,110 @@ print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
     ## , ,  = C
     ## 
     ##             
-    ##              Fast Paced Hyper Paced
-    ##   North-East          0           0
-    ##   North-West          0           0
-    ##   South-East          0           0
-    ##   South-West          0           0
+    ##              Fast Paced
+    ##   North-East          0
+    ##   North-West          0
+    ##   South-East          0
+    ##   South-West          0
     ##             
-    ##              Medium Paced Slow Paced
-    ##   North-East           19          0
-    ##   North-West           10          0
-    ##   South-East           18          0
-    ##   South-West           13          0
+    ##              Hyper Paced
+    ##   North-East           0
+    ##   North-West           0
+    ##   South-East           0
+    ##   South-West           0
+    ##             
+    ##              Medium Paced
+    ##   North-East           19
+    ##   North-West           10
+    ##   South-East           18
+    ##   South-West           13
+    ##             
+    ##              Slow Paced
+    ##   North-East          0
+    ##   North-West          0
+    ##   South-East          0
+    ##   South-West          0
     ## 
     ## , ,  = O
     ## 
     ##             
-    ##              Fast Paced Hyper Paced
-    ##   North-East          0           0
-    ##   North-West          3           0
-    ##   South-East          0           0
-    ##   South-West          3           0
+    ##              Fast Paced
+    ##   North-East          0
+    ##   North-West          3
+    ##   South-East          0
+    ##   South-West          3
     ##             
-    ##              Medium Paced Slow Paced
-    ##   North-East            0          0
-    ##   North-West            0          0
-    ##   South-East            0          0
-    ##   South-West            0          0
+    ##              Hyper Paced
+    ##   North-East           0
+    ##   North-West           0
+    ##   South-East           0
+    ##   South-West           0
+    ##             
+    ##              Medium Paced
+    ##   North-East            0
+    ##   North-West            0
+    ##   South-East            0
+    ##   South-West            0
+    ##             
+    ##              Slow Paced
+    ##   North-East          0
+    ##   North-West          0
+    ##   South-East          0
+    ##   South-West          0
     ## 
     ## , ,  = R
     ## 
     ##             
-    ##              Fast Paced Hyper Paced
-    ##   North-East          0           0
-    ##   North-West          0           2
-    ##   South-East          0           0
-    ##   South-West          0           0
+    ##              Fast Paced
+    ##   North-East          0
+    ##   North-West          0
+    ##   South-East          0
+    ##   South-West          0
     ##             
-    ##              Medium Paced Slow Paced
-    ##   North-East            0          0
-    ##   North-West            0          0
-    ##   South-East            0          0
-    ##   South-West            0          0
+    ##              Hyper Paced
+    ##   North-East           0
+    ##   North-West           2
+    ##   South-East           0
+    ##   South-West           0
+    ##             
+    ##              Medium Paced
+    ##   North-East            0
+    ##   North-West            0
+    ##   South-East            0
+    ##   South-West            0
+    ##             
+    ##              Slow Paced
+    ##   North-East          0
+    ##   North-West          0
+    ##   South-East          0
+    ##   South-West          0
     ## 
     ## , ,  = S
     ## 
     ##             
-    ##              Fast Paced Hyper Paced
-    ##   North-East          0           0
-    ##   North-West          0           0
-    ##   South-East          0           0
-    ##   South-West          0           0
+    ##              Fast Paced
+    ##   North-East          0
+    ##   North-West          0
+    ##   South-East          0
+    ##   South-West          0
     ##             
-    ##              Medium Paced Slow Paced
-    ##   North-East            0         75
-    ##   North-West            0         56
-    ##   South-East            0         54
-    ##   South-West            0         71
+    ##              Hyper Paced
+    ##   North-East           0
+    ##   North-West           0
+    ##   South-East           0
+    ##   South-West           0
+    ##             
+    ##              Medium Paced
+    ##   North-East            0
+    ##   North-West            0
+    ##   South-East            0
+    ##   South-West            0
+    ##             
+    ##              Slow Paced
+    ##   North-East         75
+    ##   North-West         56
+    ##   South-East         54
+    ##   South-West         71
 
 ``` r
 print(knitr::kable(table(cmeSampleData$zone, cmeSampleData$speedC)))
@@ -879,8 +1008,5 @@ ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
   labs(title="Histogram showing count of CME events in month \nthat occurred between the given dates.",
         x ="Month", y = "Count of CME events")
 ```
-
-    ## Warning: Ignoring unknown parameters:
-    ## binwidth, bins, pad
 
 ![](README_files/figure-gfm/hist-1.png)<!-- -->
