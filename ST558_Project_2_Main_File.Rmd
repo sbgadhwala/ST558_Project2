@@ -232,6 +232,7 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
   baseUrl <- 'https://api.nasa.gov/DONKI/'
   apiKey <- 'igUogzKaubKUi5TTgsbYcdVgU8pICrvizcCrCtY5'
   
+  # Start and End Dates data format check
   checkStart <- !is.na(parse_date_time(startDate, orders = "ymd"))
   if(!checkStart){
     errorMessage <- "Please enter the Start Date in the YYYY-mm-dd format and try again."
@@ -249,6 +250,7 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
     stop(errorMessage)
   }
   
+  #Speed and Half Angle data type checks
   if (!is.numeric(speed)){
     errorMessage <- "Speed can only take numeric values. Please enter speed again."
     stop(errorMessage)
@@ -269,12 +271,15 @@ cmeData <- function(startDate, endDate, speed = 0, halfAngle = 0, ...){
     halfAngle = 0
   }
   
+  #this part of the code combines the base URL with the modification(s) value(s) entered by the user
+  #targetUrl is the final URL that is hit to get the data from API
   targetUrl <- paste0(baseUrl, "CMEAnalysis?", "startDate=", startDate, 
                       "&endDate=", endDate, "&speed=", speed,
                       "&halfAngle=", halfAngle, "&api_key=", apiKey)
   
   jsonContent <- fromJSON(rawToChar(GET(targetUrl)$content))
   
+  #extracting useful info from the API data
   time <- jsonContent$time21_5
   lat <- jsonContent$latitude
   lon <- jsonContent$longitude
@@ -410,7 +415,7 @@ summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude))
 ```
 
 To start with the initial EDA, using ggplot2 library, I have made a scatter plot representing the latitude and longitude of each of the CME events taking place on sun's atmosphere.
- The different colored dots represent the different event types, while the size of the dots represent the spped of explosion. the smaller the dot, the lesser the speed of the event and vice versa.
+ The different colored dots represent the different event types, while the size of the dots represent the speed of explosion. the smaller the dot, the lesser the speed of the event and vice versa.
  
 ```{r, warning=FALSE, message=FALSE, fig.width= 7.5 , fig.height=6}
 img <- readJPEG("img\\sun2.jpeg")
@@ -490,8 +495,12 @@ Then contingency table is created for zone, speed and type of events, and is sho
 ```{r cont_table, message=FALSE, warning=FALSE}
 
 print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
+
+```
+
+A simpler contingency table between the count of CME events per zone per speed category is as shown:
+```{r con_table2, message=FALSE, warning=FALSE}
 print(knitr::kable(table(cmeSampleData$zone, cmeSampleData$speedC)))
-print(knitr::kable(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type)))
 
 ```
 
@@ -557,7 +566,7 @@ ggplot(cmeSampleData, aes(x = type)) +
 
 ```
 
-Lastly, I took the dates (time-stamp) of events, and extracted months from them, and plotted a histogram the count of CME events occurring in each month between the given input start and end dates, classified into the type of events on the histograms bins.
+Lastly, I took the dates (time-stamp) of events, and extracted months and years from them, and plotted a histogram the count of CME events occurring in each month, and in each year between the given input start and end dates, classified into the type of events on the histograms bins.
 
 ```{r hist, message=FALSE, warning=FALSE}
 dates = c()
@@ -570,6 +579,15 @@ months = c()
 for (i in 1:nrow(cmeSampleData)){
   months <- append(months, strsplit(cmeSampleData$date[i], split="-")[[1]][2])
 }
+
+years = c()
+for (i in 1:nrow(cmeSampleData)){
+  years <- append(years, strsplit(cmeSampleData$date[i], split="-")[[1]][1])
+}
+
+cmeSampleData$numyear <- as.numeric(years)
+cmeSampleData$numyear <- as.factor(cmeSampleData$numyear)
+
 cmeSampleData$nummonth <- as.numeric(months)
 allmonths <- c("Jan","Feb","Mar",
               "Apr","May","Jun",
@@ -590,5 +608,16 @@ ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
         x ="Month", y = "Count of CME events")
 ```
 
+```{r hist_year, message=FALSE, warning=FALSE}
+ggplot(cmeSampleData %>% group_by(numyear) %>% mutate(count = n()), aes(x=numyear))+
+  geom_histogram(aes(fill=type), stat="count") + 
+  scale_fill_discrete(name = "Type") + 
+  labs(title="Histogram showing count of CME events in each year \nthat occurred between the given dates.",
+        x ="Month", y = "Count of CME events")
+
+```
+
 # Ending Remarks
 
+To summarize this vignette, we have built a wrapper function that would take the API of user's choice as input. Further two helper functions are also created to support the called API.
+Coronal Mass Ejection (CME) Analysis, helps get the data of coronal mass ejection events between two date ranges, and will have characteristics of the speed and half angle as defined by the user. Following up on the date retrieved after the API call, we have done the Exploratory Data Analysis to get some hidden and valuable insights of the data.
