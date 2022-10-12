@@ -375,7 +375,7 @@ ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
 
 ```
 
-```{r, fig.width=9, fig.height=12}
+```{r, fig.width=9, fig.height=6}
 # creating a new factor for relative speed
 speedClassfication <- c("Low Speed Asteroid", "Medium Speed Asteroid", "High Speed Asteroid" )
 astDf <- astDf %>%
