@@ -860,7 +860,7 @@ ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
   geom_smooth(method = "lm",color="black") + 
   labs(title="Scatter Plot showing relation between speed and half angle of the CME event",
         x ="Half Angle", y = "Speed") + 
-  annotate(geom="text", x=30, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
+  annotate(geom="text", x=20, y=2000, label=paste0("Correlation between \nSpeed and \nHalf angle = ", round(cor, 3)))
 ```
 
 ![](README_files/figure-gfm/cor-1.png)<!-- -->
@@ -933,10 +933,12 @@ ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
         x ="Month", y = "Count of CME events")
 ```
 
-![](README_files/figure-gfm/hist-1.png)<!-- --> The above plot suggests
-that CME events peaked in April every year, and then decreased till
-December, and again on a rise till April. This also might lead to the
-fact that Earth experiences most heat in months from April to July.
+![](README_files/figure-gfm/hist-1.png)<!-- -->
+
+The above plot suggests that CME events peaked in April every year, and
+then decreased till December, and again on a rise till April. This also
+might lead to the fact that Earth experiences most heat in months from
+April to July.
 
 ``` r
 ggplot(cmeSampleData %>% group_by(numyear) %>% mutate(count = n()), aes(x=numyear))+
