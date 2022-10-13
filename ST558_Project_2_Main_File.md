@@ -830,7 +830,7 @@ ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
   geom_smooth(method = "lm",color="black") + 
   labs(title="Scatter Plot showing relation between speed and half angle of the CME event",
         x ="Half Angle", y = "Speed") + 
-  annotate(geom="text", x=20, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
+  annotate(geom="text", x=30, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
 ```
 
 ![](ST558_Project_2_Main_FIle_files/figure-gfm/cor-1.png)<!-- -->
