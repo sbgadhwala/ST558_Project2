@@ -36,14 +36,14 @@ valuable insights.
 
 Few of the essential packages used for this project are:
 
-[httr](https://httr.r-lib.org/) to provide a wrapper function and
+[`httr`](https://httr.r-lib.org/) to provide a wrapper function and
 customized to the demand of modern web APIs.  
-[jsonlite](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html)
+[`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html)
 to provide flexibility in mapping json and R data  
-[lubridate](https://lubridate.tidyverse.org/) to manipulate date and
+[`lubridate`](https://lubridate.tidyverse.org/) to manipulate date and
 time  
-[ggplot2](https://ggplot2.tidyverse.org/) used for creating graphics  
-[tidyverse](https://www.tidyverse.org/) for data analysis purpose
+[`ggplot2`](https://ggplot2.tidyverse.org/) used for creating graphics  
+[`tidyverse`](https://www.tidyverse.org/) for data analysis purpose
 
 ``` r
 library(httr)
