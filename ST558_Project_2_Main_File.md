@@ -63,6 +63,7 @@ library(ggpubr)
 library(jpeg)
 library(lubridate)
 library(GGally)
+library(corrplot)
 ```
 
 # Asteroid - NeoWs
@@ -415,18 +416,18 @@ summary(astDf %>% select(Magnitude:Miss_Distance))
 ```
 
     ##    Magnitude     Minimum_Diameter   Maximum_Diameter  Relative_Velocity
-    ##  Min.   :15.25   Min.   :0.001896   Min.   :0.00424   Min.   :  6882   
-    ##  1st Qu.:20.43   1st Qu.:0.020792   1st Qu.:0.04649   1st Qu.: 37687   
-    ##  Median :21.57   Median :0.080150   Median :0.17922   Median : 50262   
-    ##  Mean   :22.25   Mean   :0.133732   Mean   :0.29903   Mean   : 52273   
-    ##  3rd Qu.:24.50   3rd Qu.:0.135490   3rd Qu.:0.30296   3rd Qu.: 66063   
-    ##  Max.   :29.70   Max.   :1.471994   Max.   :3.29148   Max.   :123714   
+    ##  Min.   :16.76   Min.   :0.001896   Min.   :0.00424   Min.   :  7037   
+    ##  1st Qu.:20.62   1st Qu.:0.019429   1st Qu.:0.04344   1st Qu.: 35301   
+    ##  Median :22.15   Median :0.061379   Median :0.13725   Median : 49976   
+    ##  Mean   :22.65   Mean   :0.103730   Mean   :0.23195   Mean   : 52996   
+    ##  3rd Qu.:24.65   3rd Qu.:0.123998   3rd Qu.:0.27727   3rd Qu.: 67034   
+    ##  Max.   :29.70   Max.   :0.734355   Max.   :1.64207   Max.   :123714   
     ##  Approach_Date      Miss_Distance     
-    ##  Length:73          Min.   :0.003582  
-    ##  Class :character   1st Qu.:0.193351  
-    ##  Mode  :character   Median :0.293841  
-    ##                     Mean   :0.284901  
-    ##                     3rd Qu.:0.390529  
+    ##  Length:76          Min.   :0.003582  
+    ##  Class :character   1st Qu.:0.186202  
+    ##  Mode  :character   Median :0.291632  
+    ##                     Mean   :0.283531  
+    ##                     3rd Qu.:0.386678  
     ##                     Max.   :0.498633
 
 ``` r
@@ -437,11 +438,19 @@ plot1 <- ggplot(astDf, aes(x = Approach_Date, y = Miss_Distance))
 plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
   theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())+
   theme(axis.text.y = element_blank(), 
-        axis.ticks.y = element_blank()
-        )
+        axis.ticks.y = element_blank()) +
+  labs(title = 'Point Plot',
+      subtitle = "Miss Distance For Date Range")
 ```
 
 ![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+In the scatter plot, I have tried to visualize the count for Miss
+Distance for a give n date range with diameter as a size and if that
+particular asteroid is hazardous or not. Few key finding from the
+plots:  
+1. Most of the asteroids are categorized as a non hazardous for a given
+date range  
+2. All bigger asteroid (large diameter) are in upper part of the plot
 
 ``` r
 # boxplot for min and max diamter
@@ -453,22 +462,44 @@ plot2 +
   geom_boxplot() + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid), position = 'jitter') + 
   labs('Box Plot for Minimum Diameter') + 
   xlab('If Asteroid Hazardous ') + 
-  ylab('Minimum Diamter')
+  ylab('Minimum Diamter') + 
+  labs(title = "Box Plot",
+       subtitle = "Minimum Diamter Variation Across Asteroid Type ")
 ```
 
 ![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
+The dark line in box plot represent the median and the top box is 75
+%ile and bottom box is 25 %ile. The end points of the black line are
+whiskers and they are at a distance of 1.5\*IQR. In this plot we can
+visualize that the median diameter of potentially hazardous asteroid is
+higher than the non hazardous asteroid. From the plot, we can also
+visualize few extreme points (\>1.5IQR).
+
 ``` r
-library(ggplot2)
+numericalDf <- astDf[, c(1,2,3,4,6)]
 
-# correlation plot
-numericalDf <- astDf [, c(1,2,3,4,6)]  
+corr <- cor(numericalDf, method = "spearman")
 
-ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
-        color = 'Is_Potentially_Hazardous_Asteroid')
+# Plot
+corrplot(corr, hc.order = TRUE, 
+           type = "lower", 
+           tl.pos = "lt",
+         title = "Correlation Plot",
+         subtitle = "Correlation Coefficient for Asteroid Data",
+         mar=c(0,0,2,0)
+         )
 ```
 
 ![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+Correlation plot gives the relation among parameters, i.e is there any
+increase or decrease in a parameter directly affecting other parameter.
+From this correlation plot of asteroid data we can estimate that almost
+all parameters have a weak positive correlation coefficient.Magnitude
+and Relative velocity has a strong negative correlation coefficient,
+which needs to be taken care (adding interaction terms) in a model
+building.
 
 ``` r
 # creating a new factor for relative speed
@@ -754,9 +785,9 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
 
 ![](ST558_Project_2_Main_FIle_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
 
-A correlation plot between speed and half angle is also shown. A linear
-model regression line is also fitted with the help of geom_smooth
-function.
+A scatter plot between speed and half angle is also shown to visualize
+correlation between the two variables. A linear model regression line is
+also fitted with the help of geom_smooth function.
 
 ``` r
 cor <- cor(cmeSampleData$halfAngle, cmeSampleData$speed)
@@ -786,10 +817,9 @@ ggplot(cmeSampleData, aes(x = type)) +
 ![](ST558_Project_2_Main_FIle_files/figure-gfm/barplot-1.png)<!-- -->
 
 Lastly, I took the dates (time-stamp) of events, and extracted months
-and years from them, and plotted a histogram the count of CME events
-occurring in each month, and in each year between the given input start
-and end dates, classified into the type of events on the histograms
-bins.
+and years from them, and plotted histograms for the count of CME events
+occurring in each month, and each year between the given input start and
+end dates, classified into the type of events on the histograms bins.
 
 ``` r
 dates = c()
@@ -838,7 +868,7 @@ ggplot(cmeSampleData %>% group_by(numyear) %>% mutate(count = n()), aes(x=numyea
   geom_histogram(aes(fill=type), stat="count") + 
   scale_fill_discrete(name = "Type") + 
   labs(title="Histogram showing count of CME events in each year \nthat occurred between the given dates.",
-        x ="Month", y = "Count of CME events")
+        x ="Year", y = "Count of CME events")
 ```
 
 ![](ST558_Project_2_Main_FIle_files/figure-gfm/hist_year-1.png)<!-- -->
@@ -848,8 +878,12 @@ ggplot(cmeSampleData %>% group_by(numyear) %>% mutate(count = n()), aes(x=numyea
 To summarize this vignette, we have built a wrapper function that would
 take the API of user’s choice as input. Further two helper functions are
 also created to support the called API. Coronal Mass Ejection (CME)
-Analysis, helps get the data of coronal mass ejection events between two
+Analysis helps get the data of coronal mass ejection events between two
 date ranges, and will have characteristics of the speed and half angle
-as defined by the user. Following up on the date retrieved after the API
-call, we have done the Exploratory Data Analysis to get some hidden and
-valuable insights of the data.
+as defined by the user. In similar fashion asteroid API helps in
+retrieving data pertaining to near earth objects like asteroid and
+comets. Following up on the date retrieved after the API call, we have
+done the Exploratory Data Analysis to get some hidden and valuable
+insights from the data.
+
+Hope the functions build for this vignette helps for the NASA APIs!

@@ -63,6 +63,7 @@ library(ggpubr)
 library(jpeg)
 library(lubridate)
 library(GGally)
+library(corrplot)
 ```
 
 # Asteroid - NeoWs
@@ -415,21 +416,21 @@ summary(astDf %>% select(Magnitude:Miss_Distance))
 ```
 
     ##    Magnitude     Minimum_Diameter  
-    ##  Min.   :15.25   Min.   :0.001896  
-    ##  1st Qu.:20.43   1st Qu.:0.020792  
-    ##  Median :21.57   Median :0.080150  
-    ##  Mean   :22.25   Mean   :0.133732  
-    ##  3rd Qu.:24.50   3rd Qu.:0.135490  
-    ##  Max.   :29.70   Max.   :1.471994  
+    ##  Min.   :16.76   Min.   :0.001896  
+    ##  1st Qu.:20.62   1st Qu.:0.019429  
+    ##  Median :22.15   Median :0.061379  
+    ##  Mean   :22.65   Mean   :0.103730  
+    ##  3rd Qu.:24.65   3rd Qu.:0.123998  
+    ##  Max.   :29.70   Max.   :0.734355  
     ##  Maximum_Diameter  Relative_Velocity
-    ##  Min.   :0.00424   Min.   :  6882   
-    ##  1st Qu.:0.04649   1st Qu.: 37687   
-    ##  Median :0.17922   Median : 50262   
-    ##  Mean   :0.29903   Mean   : 52273   
-    ##  3rd Qu.:0.30296   3rd Qu.: 66063   
-    ##  Max.   :3.29148   Max.   :123714   
+    ##  Min.   :0.00424   Min.   :  7037   
+    ##  1st Qu.:0.04344   1st Qu.: 35301   
+    ##  Median :0.13725   Median : 49976   
+    ##  Mean   :0.23195   Mean   : 52996   
+    ##  3rd Qu.:0.27727   3rd Qu.: 67034   
+    ##  Max.   :1.64207   Max.   :123714   
     ##  Approach_Date     
-    ##  Length:73         
+    ##  Length:76         
     ##  Class :character  
     ##  Mode  :character  
     ##                    
@@ -437,10 +438,10 @@ summary(astDf %>% select(Magnitude:Miss_Distance))
     ##                    
     ##  Miss_Distance     
     ##  Min.   :0.003582  
-    ##  1st Qu.:0.193351  
-    ##  Median :0.293841  
-    ##  Mean   :0.284901  
-    ##  3rd Qu.:0.390529  
+    ##  1st Qu.:0.186202  
+    ##  Median :0.291632  
+    ##  Mean   :0.283531  
+    ##  3rd Qu.:0.386678  
     ##  Max.   :0.498633
 
 ``` r
@@ -451,11 +452,18 @@ plot1 <- ggplot(astDf, aes(x = Approach_Date, y = Miss_Distance))
 plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum_Diameter), alpha = 0.7) +
   theme(axis.text.x = element_text(angle = 45), axis.text.y = element_blank())+
   theme(axis.text.y = element_blank(), 
-        axis.ticks.y = element_blank()
-        )
+        axis.ticks.y = element_blank()) +
+  labs(title = 'Point Plot',
+      subtitle = "Miss Distance For Date Range")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> In the
+scatter plot, I have tried to visualize the count for Miss Distance for
+a give n date range with diameter as a size and if that particular
+asteroid is hazardous or not. Few key finding from the plots:  
+1. Most of the asteroids are categorized as a non hazardous for a given
+date range  
+2. All bigger asteroid (large diameter) are in upper part of the plot
 
 ``` r
 # boxplot for min and max diamter
@@ -467,22 +475,44 @@ plot2 +
   geom_boxplot() + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid), position = 'jitter') + 
   labs('Box Plot for Minimum Diameter') + 
   xlab('If Asteroid Hazardous ') + 
-  ylab('Minimum Diamter')
-```
-
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
-
-``` r
-library(ggplot2)
-
-# correlation plot
-numericalDf <- astDf [, c(1,2,3,4,6)]  
-
-ggpairs(numericalDf, color = 'red', main = 'Scatter Plot',
-        color = 'Is_Potentially_Hazardous_Asteroid')
+  ylab('Minimum Diamter') + 
+  labs(title = "Box Plot",
+       subtitle = "Minimum Diamter Variation Across Asteroid Type ")
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+The dark line in box plot represent the median and the top box is 75
+%ile and bottom box is 25 %ile. The end points of the black line are
+whiskers and they are at a distance of 1.5\*IQR. In this plot we can
+visualize that the median diameter of potentially hazardous asteroid is
+higher than the non hazardous asteroid. From the plot, we can also
+visualize few extreme points (\>1.5IQR).
+
+``` r
+numericalDf <- astDf[, c(1,2,3,4,6)]
+
+corr <- cor(numericalDf, method = "spearman")
+
+# Plot
+corrplot(corr, hc.order = TRUE, 
+           type = "lower", 
+           tl.pos = "lt",
+         title = "Correlation Plot",
+         subtitle = "Correlation Coefficient for Asteroid Data",
+         mar=c(0,0,2,0)
+         )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+Correlation plot gives the relation among parameters, i.e is there any
+increase or decrease in a parameter directly affecting other parameter.
+From this correlation plot of asteroid data we can estimate that almost
+all parameters have a weak positive correlation coefficient.Magnitude
+and Relative velocity has a strong negative correlation coefficient,
+which needs to be taken care (adding interaction terms) in a model
+building.
 
 ``` r
 # creating a new factor for relative speed
@@ -503,7 +533,7 @@ plot3 + geom_bar(stat = 'count', position = position_dodge()) +
         labs(title = "Facet Plot for Relative Velocity Count ")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 # Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API Data.
 
@@ -522,23 +552,24 @@ cmeSampleData <- apiSelection("Coronal Mass Ejection (CME) Analysis", "2017-01-0
 print(cmeSampleData)
 ```
 
-    ## # A tibble: 324 × 6
-    ##    time  latit…¹ longi…² halfA…³ speed
+    ## # A tibble: 324 x 6
+    ##    time  latit~1 longi~2 halfA~3 speed
     ##    <chr>   <dbl>   <dbl>   <dbl> <dbl>
-    ##  1 2017…     -10    -105      20   645
-    ##  2 2017…     -33     -93      26    88
-    ##  3 2017…       3     100      22   167
-    ##  4 2017…       1     -90      36   580
-    ##  5 2017…      10    -155      10   628
-    ##  6 2017…      11      90      15   365
-    ##  7 2017…       0     -48      14   353
-    ##  8 2017…      11     160      11   723
-    ##  9 2017…      16     -80      21   429
-    ## 10 2017…      21     105      26   276
-    ## # … with 314 more rows, 1 more
+    ##  1 2017~     -10    -105      20   645
+    ##  2 2017~     -33     -93      26    88
+    ##  3 2017~       3     100      22   167
+    ##  4 2017~       1     -90      36   580
+    ##  5 2017~      10    -155      10   628
+    ##  6 2017~      11      90      15   365
+    ##  7 2017~       0     -48      14   353
+    ##  8 2017~      11     160      11   723
+    ##  9 2017~      16     -80      21   429
+    ## 10 2017~      21     105      26   276
+    ## # ... with 314 more rows, 1 more
     ## #   variable: type <chr>, and
     ## #   abbreviated variable names
-    ## #   ¹​latitude, ²​longitude, ³​halfAngle
+    ## #   1: latitude, 2: longitude,
+    ## #   3: halfAngle
 
 ``` r
 summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude))
@@ -579,7 +610,7 @@ show(ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude"))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 To see it more in respect to the actual sun’s corona layer, I have
 imported an image of sun and use it as a background to give a better
@@ -635,25 +666,25 @@ cmeSampleData <- cmeSampleData %>%
 cmeSampleData
 ```
 
-    ## # A tibble: 324 × 9
-    ##    time  latit…¹ longi…² halfA…³ speed
+    ## # A tibble: 324 x 9
+    ##    time  latit~1 longi~2 halfA~3 speed
     ##    <chr>   <dbl>   <dbl>   <dbl> <dbl>
-    ##  1 2017…     -10    -105      20   645
-    ##  2 2017…     -33     -93      26    88
-    ##  3 2017…       3     100      22   167
-    ##  4 2017…       1     -90      36   580
-    ##  5 2017…      10    -155      10   628
-    ##  6 2017…      11      90      15   365
-    ##  7 2017…       0     -48      14   353
-    ##  8 2017…      11     160      11   723
-    ##  9 2017…      16     -80      21   429
-    ## 10 2017…      21     105      26   276
-    ## # … with 314 more rows, 4 more
+    ##  1 2017~     -10    -105      20   645
+    ##  2 2017~     -33     -93      26    88
+    ##  3 2017~       3     100      22   167
+    ##  4 2017~       1     -90      36   580
+    ##  5 2017~      10    -155      10   628
+    ##  6 2017~      11      90      15   365
+    ##  7 2017~       0     -48      14   353
+    ##  8 2017~      11     160      11   723
+    ##  9 2017~      16     -80      21   429
+    ## 10 2017~      21     105      26   276
+    ## # ... with 314 more rows, 4 more
     ## #   variables: type <fct>,
     ## #   speedC <fct>, zone <fct>,
     ## #   halfAngleC <fct>, and abbreviated
-    ## #   variable names ¹​latitude,
-    ## #   ²​longitude, ³​halfAngle
+    ## #   variable names 1: latitude,
+    ## #   2: longitude, 3: halfAngle
 
 Then from the data, I have grouped the data by combining zone, speed and
 type of event, and for each group, I have calculated the number of
@@ -668,26 +699,26 @@ cmeSampleData %>%
             sdHalfAngle = sd(halfAngle), count = n()) %>% arrange(zone, speedC)
 ```
 
-    ## # A tibble: 11 × 8
+    ## # A tibble: 11 x 8
     ## # Groups:   zone, speedC [11]
-    ##    zone   speedC type  avgSp…¹ sdSpeed
+    ##    zone   speedC type  avgSp~1 sdSpeed
     ##    <fct>  <fct>  <fct>   <dbl>   <dbl>
-    ##  1 North… Mediu… C        627.   100. 
-    ##  2 North… Slow … S        325.    88.3
-    ##  3 North… Fast … O       1177.    62.0
-    ##  4 North… Hyper… R       2460.   268. 
-    ##  5 North… Mediu… C        620.    82.6
-    ##  6 North… Slow … S        326.    95.1
-    ##  7 South… Mediu… C        634.   126. 
-    ##  8 South… Slow … S        313.    90.5
-    ##  9 South… Fast … O       1437     32.0
-    ## 10 South… Mediu… C        691.   173. 
-    ## 11 South… Slow … S        328.    81.7
-    ## # … with 3 more variables:
+    ##  1 North~ Mediu~ C        627.   100. 
+    ##  2 North~ Slow ~ S        325.    88.3
+    ##  3 North~ Fast ~ O       1177.    62.0
+    ##  4 North~ Hyper~ R       2460.   268. 
+    ##  5 North~ Mediu~ C        620.    82.6
+    ##  6 North~ Slow ~ S        326.    95.1
+    ##  7 South~ Mediu~ C        634.   126. 
+    ##  8 South~ Slow ~ S        313.    90.5
+    ##  9 South~ Fast ~ O       1437     32.0
+    ## 10 South~ Mediu~ C        691.   173. 
+    ## 11 South~ Slow ~ S        328.    81.7
+    ## # ... with 3 more variables:
     ## #   avgHalfAngle <dbl>,
     ## #   sdHalfAngle <dbl>, count <int>,
     ## #   and abbreviated variable name
-    ## #   ¹​avgSpeed
+    ## #   1: avgSpeed
 
 Then contingency table is created for zone, speed and type of events,
 and is showed below.
@@ -812,9 +843,9 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
 
 ![](README_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
 
-A correlation plot between speed and half angle is also shown. A linear
-model regression line is also fitted with the help of geom_smooth
-function.
+A scatter plot between speed and half angle is also shown to visualize
+correlation between the two variables. A linear model regression line is
+also fitted with the help of geom_smooth function.
 
 ``` r
 cor <- cor(cmeSampleData$halfAngle, cmeSampleData$speed)
@@ -844,10 +875,9 @@ ggplot(cmeSampleData, aes(x = type)) +
 ![](README_files/figure-gfm/barplot-1.png)<!-- -->
 
 Lastly, I took the dates (time-stamp) of events, and extracted months
-and years from them, and plotted a histogram the count of CME events
-occurring in each month, and in each year between the given input start
-and end dates, classified into the type of events on the histograms
-bins.
+and years from them, and plotted histograms for the count of CME events
+occurring in each month, and each year between the given input start and
+end dates, classified into the type of events on the histograms bins.
 
 ``` r
 dates = c()
@@ -896,7 +926,7 @@ ggplot(cmeSampleData %>% group_by(numyear) %>% mutate(count = n()), aes(x=numyea
   geom_histogram(aes(fill=type), stat="count") + 
   scale_fill_discrete(name = "Type") + 
   labs(title="Histogram showing count of CME events in each year \nthat occurred between the given dates.",
-        x ="Month", y = "Count of CME events")
+        x ="Year", y = "Count of CME events")
 ```
 
 ![](README_files/figure-gfm/hist_year-1.png)<!-- -->
@@ -906,8 +936,12 @@ ggplot(cmeSampleData %>% group_by(numyear) %>% mutate(count = n()), aes(x=numyea
 To summarize this vignette, we have built a wrapper function that would
 take the API of user’s choice as input. Further two helper functions are
 also created to support the called API. Coronal Mass Ejection (CME)
-Analysis, helps get the data of coronal mass ejection events between two
+Analysis helps get the data of coronal mass ejection events between two
 date ranges, and will have characteristics of the speed and half angle
-as defined by the user. Following up on the date retrieved after the API
-call, we have done the Exploratory Data Analysis to get some hidden and
-valuable insights of the data.
+as defined by the user. In similar fashion asteroid API helps in
+retrieving data pertaining to near earth objects like asteroid and
+comets. Following up on the date retrieved after the API call, we have
+done the Exploratory Data Analysis to get some hidden and valuable
+insights from the data.
+
+Hope the functions build for this vignette helps for the NASA APIs!
