@@ -4,7 +4,6 @@ author: "Shyam Gadhwala & Kamlesh Pandey"
 output: 
   github_document:
     toc : True
-    
 ---
 
 # Introduction and required libraries
