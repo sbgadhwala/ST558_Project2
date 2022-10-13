@@ -18,7 +18,7 @@ Few of the essential packages used for this project are:
 [httr](https://httr.r-lib.org/)  to provide a wrapper function and customized to the demand of modern web APIs.  
 [jsonlite](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) to provide flexibility in mapping json and R data  
 [lubridate](https://lubridate.tidyverse.org/) to manipulate date and time  
-[ggplot](https://ggplot2.tidyverse.org/) used for creating graphics  
+[ggplot2](https://ggplot2.tidyverse.org/) used for creating graphics  
 [tidyverse](https://www.tidyverse.org/) for data analysis purpose  
 
 ```{r, warning=FALSE, message=FALSE}
@@ -335,9 +335,16 @@ When the API returns the data, the useful data is converted to a tibble and is s
 
 ```{r, message=FALSE, warning=FALSE}
 
-astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2017-08-01')$data
+# first API call
+astDf <- apiSelection(api = "Asteroids - NeoWs", '2019-01-10', '2019-08-10')$data
 
-summary(astDf %>% select(Magnitude:Miss_Distance))
+# second API call
+astDf1 <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2017-08-01')$data
+
+# Merging results from both API call
+astDf <- rbind(astDf, astDf1)
+
+knitr::kable(summary(astDf %>% select(Magnitude:Miss_Distance, -Approach_Date)))
 
 ```
 
@@ -427,9 +434,12 @@ When the API returns the data, the useful data is converted to a tibble and is s
 Both tibbles are merged into a single tibble that will be used further here in the project. I have printed the summary of the data to get a generalized overview.
 
 ```{r eda_cme, message=FALSE, warning=FALSE}
+# First API call
 cmeSampleData <- apiSelection("Coronal Mass Ejection (CME) Analysis", "2015-01-01", "2016-06-30")$data
+# Second API call
 cmeSampleData2 <- apiSelection("Coronal Mass Ejection (CME) Analysis", "2017-01-01", "2019-12-31")$data
 
+# Merging data from both API
 cmeSampleData <- rbind(cmeSampleData, cmeSampleData2)
 
 print(cmeSampleData)

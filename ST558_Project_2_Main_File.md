@@ -2,36 +2,25 @@ ST558 Project 2 - NASA APIs
 ================
 Shyam Gadhwala & Kamlesh Pandey
 
--   <a href="#introduction-and-required-libraries"
-    id="toc-introduction-and-required-libraries">Introduction and required
-    libraries</a>
--   <a href="#asteroid---neows" id="toc-asteroid---neows">Asteroid -
-    NeoWs</a>
-    -   <a href="#asteroid---neows-api" id="toc-asteroid---neows-api">Asteroid -
-        NeoWs API</a>
-    -   <a href="#helper-function-to-get-the-asteroid-neows-data"
-        id="toc-helper-function-to-get-the-asteroid-neows-data">Helper function
-        to get the Asteroid NeoWs data:</a>
--   <a href="#coronal-mass-ejection-cme-analysis"
-    id="toc-coronal-mass-ejection-cme-analysis">Coronal Mass Ejection (CME)
-    Analysis</a>
-    -   <a href="#coronal-mass-ejection-cme-analysis-api"
-        id="toc-coronal-mass-ejection-cme-analysis-api">Coronal Mass Ejection
-        (CME) Analysis API:</a>
-    -   <a href="#helper-function-to-get-the-cme-data"
-        id="toc-helper-function-to-get-the-cme-data">Helper function to get the
-        CME data:</a>
--   <a href="#parent-wrapper-function"
-    id="toc-parent-wrapper-function">Parent Wrapper Function</a>
--   <a href="#exploratory-data-analysis-for-asteroid---neows-api-data"
-    id="toc-exploratory-data-analysis-for-asteroid---neows-api-data">Exploratory
-    Data Analysis for Asteroid - NeoWs API Data</a>
--   <a
-    href="#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data"
-    id="toc-exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data">Exploratory
-    Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API
-    Data.</a>
--   <a href="#ending-remarks" id="toc-ending-remarks">Ending Remarks</a>
+-   [Introduction and required
+    libraries](#introduction-and-required-libraries)
+-   [Asteroid - NeoWs](#asteroid---neows)
+    -   [Asteroid - NeoWs API](#asteroid---neows-api)
+    -   [Helper function to get the Asteroid NeoWs
+        data:](#helper-function-to-get-the-asteroid-neows-data)
+-   [Coronal Mass Ejection (CME)
+    Analysis](#coronal-mass-ejection-cme-analysis)
+    -   [Coronal Mass Ejection (CME) Analysis
+        API:](#coronal-mass-ejection-cme-analysis-api)
+    -   [Helper function to get the CME
+        data:](#helper-function-to-get-the-cme-data)
+-   [Parent Wrapper Function](#parent-wrapper-function)
+-   [Exploratory Data Analysis for Asteroid - NeoWs API
+    Data](#exploratory-data-analysis-for-asteroid---neows-api-data)
+-   [Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME)
+    Analysis API
+    Data.](#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data)
+-   [Ending Remarks](#ending-remarks)
 
 # Introduction and required libraries
 
@@ -53,7 +42,7 @@ customized to the demand of modern web APIs.
 to provide flexibility in mapping json and R data  
 [lubridate](https://lubridate.tidyverse.org/) to manipulate date and
 time  
-[ggplot](https://ggplot2.tidyverse.org/) used for creating graphics  
+[ggplot2](https://ggplot2.tidyverse.org/) used for creating graphics  
 [tidyverse](https://www.tidyverse.org/) for data analysis purpose
 
 ``` r
@@ -414,25 +403,26 @@ and is showed below. I have also called the summary function to get an
 overview of numerical feature columns.
 
 ``` r
-astDf <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2017-08-01')$data
+# first API call
+astDf <- apiSelection(api = "Asteroids - NeoWs", '2019-01-10', '2019-08-10')$data
 
-summary(astDf %>% select(Magnitude:Miss_Distance))
+# second API call
+astDf1 <- apiSelection(api = "Asteroids - NeoWs", '2017-01-01', '2017-08-01')$data
+
+# Merging results from both API call
+astDf <- rbind(astDf, astDf1)
+
+knitr::kable(summary(astDf %>% select(Magnitude:Miss_Distance, -Approach_Date)))
 ```
 
-    ##    Magnitude     Minimum_Diameter   Maximum_Diameter  Relative_Velocity
-    ##  Min.   :16.76   Min.   :0.001896   Min.   :0.00424   Min.   :  7037   
-    ##  1st Qu.:20.62   1st Qu.:0.019429   1st Qu.:0.04344   1st Qu.: 35301   
-    ##  Median :22.15   Median :0.061379   Median :0.13725   Median : 49976   
-    ##  Mean   :22.65   Mean   :0.103730   Mean   :0.23195   Mean   : 52996   
-    ##  3rd Qu.:24.65   3rd Qu.:0.123998   3rd Qu.:0.27727   3rd Qu.: 67034   
-    ##  Max.   :29.70   Max.   :0.734355   Max.   :1.64207   Max.   :123714   
-    ##  Approach_Date      Miss_Distance     
-    ##  Length:76          Min.   :0.003582  
-    ##  Class :character   1st Qu.:0.186202  
-    ##  Mode  :character   Median :0.291632  
-    ##                     Mean   :0.283531  
-    ##                     3rd Qu.:0.386678  
-    ##                     Max.   :0.498633
+|     | Magnitude     | Minimum_Diameter | Maximum_Diameter | Relative_Velocity | Miss_Distance    |
+|:----|:--------------|:-----------------|:-----------------|:------------------|:-----------------|
+|     | Min. :16.76   | Min. :0.001896   | Min. :0.00424    | Min. : 7037       | Min. :0.003582   |
+|     | 1st Qu.:20.62 | 1st Qu.:0.019429 | 1st Qu.:0.04344  | 1st Qu.: 35301    | 1st Qu.:0.186202 |
+|     | Median :22.15 | Median :0.061379 | Median :0.13725  | Median : 49976    | Median :0.291632 |
+|     | Mean :22.65   | Mean :0.103730   | Mean :0.23195    | Mean : 52996      | Mean :0.283531   |
+|     | 3rd Qu.:24.65 | 3rd Qu.:0.123998 | 3rd Qu.:0.27727  | 3rd Qu.: 67034    | 3rd Qu.:0.386678 |
+|     | Max. :29.70   | Max. :0.734355   | Max. :1.64207    | Max. :123714      | Max. :0.498633   |
 
 ``` r
 # EDA on Asteroid data
@@ -447,7 +437,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
       subtitle = "Miss Distance For Date Range")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 In the scatter plot, I have tried to visualize the count for Miss
 Distance for a give n date range with diameter as a size and if that
 particular asteroid is hazardous or not. Few key finding from the
@@ -471,14 +461,14 @@ plot2 +
        subtitle = "Minimum Diamter Variation Across Asteroid Type ")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 The dark line in box plot represent the median and the top box is 75
 %ile and bottom box is 25 %ile. The end points of the black line are
 whiskers and they are at a distance of 1.5\*IQR. In this plot we can
 visualize that the median diameter of potentially hazardous asteroid is
 higher than the non hazardous asteroid. From the plot, we can also
-visualize few extreme points (\>1.5IQR).
+visualize few extreme points (>1.5IQR).
 
 ``` r
 numericalDf <- astDf[, c(1,2,3,4,6)]
@@ -495,7 +485,7 @@ corrplot(corr, hc.order = TRUE,
          )
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 Correlation plot gives the relation among parameters, i.e is there any
 increase or decrease in a parameter directly affecting other parameter.
@@ -524,7 +514,7 @@ plot3 + geom_bar(stat = 'count', position = position_dodge()) +
         labs(title = "Facet Plot for Relative Velocity Count ")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 # Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API Data.
 
@@ -540,15 +530,18 @@ will be used further here in the project. I have printed the summary of
 the data to get a generalized overview.
 
 ``` r
+# First API call
 cmeSampleData <- apiSelection("Coronal Mass Ejection (CME) Analysis", "2015-01-01", "2016-06-30")$data
+# Second API call
 cmeSampleData2 <- apiSelection("Coronal Mass Ejection (CME) Analysis", "2017-01-01", "2019-12-31")$data
 
+# Merging data from both API
 cmeSampleData <- rbind(cmeSampleData, cmeSampleData2)
 
 print(cmeSampleData)
 ```
 
-    ## # A tibble: 942 × 6
+    ## # A tibble: 942 x 6
     ##    time              latitude longitude halfAngle speed type 
     ##    <chr>                <dbl>     <dbl>     <dbl> <dbl> <chr>
     ##  1 2015-01-01T23:14Z       31        26        32   350 S    
@@ -561,7 +554,7 @@ print(cmeSampleData)
     ##  8 2015-01-10T21:22Z        7       -90        15   260 S    
     ##  9 2015-01-11T16:15Z       59      -100        30   200 S    
     ## 10 2015-01-12T07:18Z       72       -90        15   250 S    
-    ## # … with 932 more rows
+    ## # ... with 932 more rows
 
 ``` r
 knitr::kable(summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude)))
@@ -598,7 +591,7 @@ show(ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude"))
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 From the graph, we can see that the CME events are scattered throughout
 the sun’s surface depicted by latitude and longitude values. Majority of
@@ -620,7 +613,7 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/inital_plot-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/inital_plot-1.png)<!-- -->
 
 To gain more insights about the data, I have segregated the speed,
 location, and half angle from the data.  
@@ -659,20 +652,20 @@ cmeSampleData <- cmeSampleData %>%
 cmeSampleData
 ```
 
-    ## # A tibble: 942 × 9
-    ##    time              latitude longitude halfA…¹ speed type  speedC zone  halfA…²
-    ##    <chr>                <dbl>     <dbl>   <dbl> <dbl> <fct> <fct>  <fct> <fct>  
-    ##  1 2015-01-01T23:14Z       31        26      32   350 S     Slow … Nort… medium 
-    ##  2 2015-01-02T23:55Z        3        34      23   353 S     Slow … Nort… low    
-    ##  3 2015-01-03T23:40Z      -49       -82      42   210 S     Slow … Sout… medium 
-    ##  4 2015-01-07T00:25Z        9        39      12   532 C     Mediu… Nort… low    
-    ##  5 2015-01-08T03:10Z       67      -102      20   579 C     Mediu… Sout… low    
-    ##  6 2015-01-09T05:54Z      -10         2      13   265 S     Slow … Nort… low    
-    ##  7 2015-01-10T07:45Z      -19        31      16   510 C     Mediu… Nort… low    
-    ##  8 2015-01-10T21:22Z        7       -90      15   260 S     Slow … Sout… low    
-    ##  9 2015-01-11T16:15Z       59      -100      30   200 S     Slow … Sout… medium 
-    ## 10 2015-01-12T07:18Z       72       -90      15   250 S     Slow … Sout… low    
-    ## # … with 932 more rows, and abbreviated variable names ¹​halfAngle, ²​halfAngleC
+    ## # A tibble: 942 x 9
+    ##    time      latitude longitude halfAngle speed type  speedC   zone   halfAngleC
+    ##    <chr>        <dbl>     <dbl>     <dbl> <dbl> <fct> <fct>    <fct>  <fct>     
+    ##  1 2015-01-~       31        26        32   350 S     Slow Pa~ North~ medium    
+    ##  2 2015-01-~        3        34        23   353 S     Slow Pa~ North~ low       
+    ##  3 2015-01-~      -49       -82        42   210 S     Slow Pa~ South~ medium    
+    ##  4 2015-01-~        9        39        12   532 C     Medium ~ North~ low       
+    ##  5 2015-01-~       67      -102        20   579 C     Medium ~ South~ low       
+    ##  6 2015-01-~      -10         2        13   265 S     Slow Pa~ North~ low       
+    ##  7 2015-01-~      -19        31        16   510 C     Medium ~ North~ low       
+    ##  8 2015-01-~        7       -90        15   260 S     Slow Pa~ South~ low       
+    ##  9 2015-01-~       59      -100        30   200 S     Slow Pa~ South~ medium    
+    ## 10 2015-01-~       72       -90        15   250 S     Slow Pa~ South~ low       
+    ## # ... with 932 more rows
 
 Then from the data, I have grouped the data by combining zone, speed and
 type of event, and for each group, I have calculated the number of
@@ -687,7 +680,7 @@ cmeSampleData %>%
             sdHalfAngle = sd(halfAngle), count = n()) %>% arrange(zone, speedC)
 ```
 
-    ## # A tibble: 13 × 8
+    ## # A tibble: 13 x 8
     ## # Groups:   zone, speedC [13]
     ##    zone       speedC       type  avgSpeed sdSpeed avgHalfAngle sdHalfAngle count
     ##    <fct>      <fct>        <fct>    <dbl>   <dbl>        <dbl>       <dbl> <int>
@@ -806,7 +799,7 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/cme_con_tbls-1.png)<!-- -->
 
 From the plot above, we can see the statistics of each zone. It seems
 that most CME events took place in the North-East region (249 events),
@@ -832,7 +825,7 @@ ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
   annotate(geom="text", x=10, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/cor-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/cor-1.png)<!-- -->
 
 The initial speculations were true since the speed and half angle do
 show a positive correlation between them.
@@ -849,7 +842,7 @@ ggplot(cmeSampleData, aes(x = type)) +
         x ="Type", y = "Count of CME events")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/barplot-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/barplot-1.png)<!-- -->
 
 From the plot it seems that in most of the regions, the CME events
 occurred with a low half angle. In some of the zones, some types of
@@ -902,7 +895,7 @@ ggplot(cmeSampleData %>% group_by(month) %>% mutate(count = n()), aes(x=month))+
         x ="Month", y = "Count of CME events")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/hist-1.png)<!-- --> The
+![](ST558_Project_2_Main_File_files/figure-gfm/hist-1.png)<!-- --> The
 above plot suggests that CME events peaked in April every year, and then
 decreased till December, and again on a rise till April. This also might
 lead to the fact that Earth experiences most heat in months from April
@@ -916,7 +909,7 @@ ggplot(cmeSampleData %>% group_by(numyear) %>% mutate(count = n()), aes(x=numyea
         x ="Year", y = "Count of CME events")
 ```
 
-![](ST558_Project_2_Main_FIle_files/figure-gfm/hist_year-1.png)<!-- -->
+![](ST558_Project_2_Main_File_files/figure-gfm/hist_year-1.png)<!-- -->
 
 The plot above shows that most CME events took place in the year of 2015
 (\~450), while least CME events took place in the year of 2018 (\~50).
