@@ -2,25 +2,36 @@ ST558 Project 2 - NASA APIs
 ================
 Shyam Gadhwala & Kamlesh Pandey
 
--   [Introduction and required
-    libraries](#introduction-and-required-libraries)
--   [Asteroid - NeoWs](#asteroid---neows)
-    -   [Asteroid - NeoWs API](#asteroid---neows-api)
-    -   [Helper function to get the Asteroid NeoWs
-        data:](#helper-function-to-get-the-asteroid-neows-data)
--   [Coronal Mass Ejection (CME)
-    Analysis](#coronal-mass-ejection-cme-analysis)
-    -   [Coronal Mass Ejection (CME) Analysis
-        API:](#coronal-mass-ejection-cme-analysis-api)
-    -   [Helper function to get the CME
-        data:](#helper-function-to-get-the-cme-data)
--   [Parent Wrapper Function](#parent-wrapper-function)
--   [Exploratory Data Analysis for Asteroid - NeoWs API
-    Data](#exploratory-data-analysis-for-asteroid---neows-api-data)
--   [Exploratory Data Analysis (EDA) of Coronal Mass Ejection (CME)
-    Analysis API
-    Data.](#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data)
--   [Ending Remarks](#ending-remarks)
+-   <a href="#introduction-and-required-libraries"
+    id="toc-introduction-and-required-libraries">Introduction and required
+    libraries</a>
+-   <a href="#asteroid---neows" id="toc-asteroid---neows">Asteroid -
+    NeoWs</a>
+    -   <a href="#asteroid---neows-api" id="toc-asteroid---neows-api">Asteroid -
+        NeoWs API</a>
+    -   <a href="#helper-function-to-get-the-asteroid-neows-data"
+        id="toc-helper-function-to-get-the-asteroid-neows-data">Helper function
+        to get the Asteroid NeoWs data:</a>
+-   <a href="#coronal-mass-ejection-cme-analysis"
+    id="toc-coronal-mass-ejection-cme-analysis">Coronal Mass Ejection (CME)
+    Analysis</a>
+    -   <a href="#coronal-mass-ejection-cme-analysis-api"
+        id="toc-coronal-mass-ejection-cme-analysis-api">Coronal Mass Ejection
+        (CME) Analysis API:</a>
+    -   <a href="#helper-function-to-get-the-cme-data"
+        id="toc-helper-function-to-get-the-cme-data">Helper function to get the
+        CME data:</a>
+-   <a href="#parent-wrapper-function"
+    id="toc-parent-wrapper-function">Parent Wrapper Function</a>
+-   <a href="#exploratory-data-analysis-for-asteroid---neows-api-data"
+    id="toc-exploratory-data-analysis-for-asteroid---neows-api-data">Exploratory
+    Data Analysis for Asteroid - NeoWs API Data</a>
+-   <a
+    href="#exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data"
+    id="toc-exploratory-data-analysis-eda-of-coronal-mass-ejection-cme-analysis-api-data">Exploratory
+    Data Analysis (EDA) of Coronal Mass Ejection (CME) Analysis API
+    Data.</a>
+-   <a href="#ending-remarks" id="toc-ending-remarks">Ending Remarks</a>
 
 # Introduction and required libraries
 
@@ -467,7 +478,7 @@ The dark line in box plot represent the median and the top box is 75
 whiskers and they are at a distance of 1.5\*IQR. In this plot we can
 visualize that the median diameter of potentially hazardous asteroid is
 higher than the non hazardous asteroid. From the plot, we can also
-visualize few extreme points (>1.5IQR).
+visualize few extreme points (\>1.5IQR).
 
 ``` r
 numericalDf <- astDf[, c(1,2,3,4,6)]
@@ -540,23 +551,21 @@ cmeSampleData <- rbind(cmeSampleData, cmeSampleData2)
 print(cmeSampleData)
 ```
 
-    ## # A tibble: 942 x 6
-    ##    time      latitude longitude
-    ##    <chr>        <dbl>     <dbl>
-    ##  1 2015-01-~       31        26
-    ##  2 2015-01-~        3        34
-    ##  3 2015-01-~      -49       -82
-    ##  4 2015-01-~        9        39
-    ##  5 2015-01-~       67      -102
-    ##  6 2015-01-~      -10         2
-    ##  7 2015-01-~      -19        31
-    ##  8 2015-01-~        7       -90
-    ##  9 2015-01-~       59      -100
-    ## 10 2015-01-~       72       -90
-    ## # ... with 932 more rows, and
-    ## #   3 more variables:
-    ## #   halfAngle <dbl>,
-    ## #   speed <dbl>, type <chr>
+    ## # A tibble: 942 × 6
+    ##    time        latit…¹ longi…² halfA…³ speed type 
+    ##    <chr>         <dbl>   <dbl>   <dbl> <dbl> <chr>
+    ##  1 2015-01-01…      31      26      32   350 S    
+    ##  2 2015-01-02…       3      34      23   353 S    
+    ##  3 2015-01-03…     -49     -82      42   210 S    
+    ##  4 2015-01-07…       9      39      12   532 C    
+    ##  5 2015-01-08…      67    -102      20   579 C    
+    ##  6 2015-01-09…     -10       2      13   265 S    
+    ##  7 2015-01-10…     -19      31      16   510 C    
+    ##  8 2015-01-10…       7     -90      15   260 S    
+    ##  9 2015-01-11…      59    -100      30   200 S    
+    ## 10 2015-01-12…      72     -90      15   250 S    
+    ## # … with 932 more rows, and abbreviated variable
+    ## #   names ¹​latitude, ²​longitude, ³​halfAngle
 
 ``` r
 knitr::kable(summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude)))
@@ -593,7 +602,7 @@ show(ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
         x ="Latitude", y = "Longitude"))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 From the graph, we can see that the CME events are scattered throughout
 the sun’s surface depicted by latitude and longitude values. Majority of
@@ -654,25 +663,23 @@ cmeSampleData <- cmeSampleData %>%
 cmeSampleData
 ```
 
-    ## # A tibble: 942 x 9
-    ##    time      latitude longitude
-    ##    <chr>        <dbl>     <dbl>
-    ##  1 2015-01-~       31        26
-    ##  2 2015-01-~        3        34
-    ##  3 2015-01-~      -49       -82
-    ##  4 2015-01-~        9        39
-    ##  5 2015-01-~       67      -102
-    ##  6 2015-01-~      -10         2
-    ##  7 2015-01-~      -19        31
-    ##  8 2015-01-~        7       -90
-    ##  9 2015-01-~       59      -100
-    ## 10 2015-01-~       72       -90
-    ## # ... with 932 more rows, and
-    ## #   6 more variables:
-    ## #   halfAngle <dbl>,
-    ## #   speed <dbl>, type <fct>,
-    ## #   speedC <fct>, zone <fct>,
-    ## #   halfAngleC <fct>
+    ## # A tibble: 942 × 9
+    ##    time        latit…¹ longi…² halfA…³ speed type 
+    ##    <chr>         <dbl>   <dbl>   <dbl> <dbl> <fct>
+    ##  1 2015-01-01…      31      26      32   350 S    
+    ##  2 2015-01-02…       3      34      23   353 S    
+    ##  3 2015-01-03…     -49     -82      42   210 S    
+    ##  4 2015-01-07…       9      39      12   532 C    
+    ##  5 2015-01-08…      67    -102      20   579 C    
+    ##  6 2015-01-09…     -10       2      13   265 S    
+    ##  7 2015-01-10…     -19      31      16   510 C    
+    ##  8 2015-01-10…       7     -90      15   260 S    
+    ##  9 2015-01-11…      59    -100      30   200 S    
+    ## 10 2015-01-12…      72     -90      15   250 S    
+    ## # … with 932 more rows, 3 more variables:
+    ## #   speedC <fct>, zone <fct>, halfAngleC <fct>,
+    ## #   and abbreviated variable names ¹​latitude,
+    ## #   ²​longitude, ³​halfAngle
 
 Then from the data, I have grouped the data by combining zone, speed and
 type of event, and for each group, I have calculated the number of
@@ -687,28 +694,26 @@ cmeSampleData %>%
             sdHalfAngle = sd(halfAngle), count = n()) %>% arrange(zone, speedC)
 ```
 
-    ## # A tibble: 13 x 8
+    ## # A tibble: 13 × 8
     ## # Groups:   zone, speedC [13]
-    ##    zone   speedC type  avgSpeed
-    ##    <fct>  <fct>  <fct>    <dbl>
-    ##  1 North~ Fast ~ O        1256 
-    ##  2 North~ Mediu~ C         630.
-    ##  3 North~ Slow ~ S         320.
-    ##  4 North~ Fast ~ O        1298.
-    ##  5 North~ Hyper~ R        2460.
-    ##  6 North~ Mediu~ C         666.
-    ##  7 North~ Slow ~ S         336.
-    ##  8 South~ Fast ~ O        1259.
-    ##  9 South~ Mediu~ C         648.
-    ## 10 South~ Slow ~ S         320.
-    ## 11 South~ Fast ~ O        1300.
-    ## 12 South~ Mediu~ C         668.
-    ## 13 South~ Slow ~ S         326.
-    ## # ... with 4 more variables:
-    ## #   sdSpeed <dbl>,
-    ## #   avgHalfAngle <dbl>,
-    ## #   sdHalfAngle <dbl>,
-    ## #   count <int>
+    ##    zone       speedC type  avgSp…¹ sdSpeed avgHa…²
+    ##    <fct>      <fct>  <fct>   <dbl>   <dbl>   <dbl>
+    ##  1 North-East Fast … O       1256    202.     39.4
+    ##  2 North-East Mediu… C        630.   104.     24.6
+    ##  3 North-East Slow … S        320.    95.3    25.1
+    ##  4 North-West Fast … O       1298.   258.     40.6
+    ##  5 North-West Hyper… R       2460.   268.     50  
+    ##  6 North-West Mediu… C        666.   129.     32.8
+    ##  7 North-West Slow … S        336.   101.     24.1
+    ##  8 South-East Fast … O       1259.   241.     37.3
+    ##  9 South-East Mediu… C        648.   131.     30.5
+    ## 10 South-East Slow … S        320.    89.1    23.5
+    ## 11 South-West Fast … O       1300.   151.     40  
+    ## 12 South-West Mediu… C        668.   132.     27.8
+    ## 13 South-West Slow … S        326.    92.5    24.1
+    ## # … with 2 more variables: sdHalfAngle <dbl>,
+    ## #   count <int>, and abbreviated variable names
+    ## #   ¹​avgSpeed, ²​avgHalfAngle
 
 Then contingency table is created for zone, speed and type of events,
 and is showed below.
@@ -720,23 +725,11 @@ print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
     ## , ,  = C
     ## 
     ##             
-    ##              Fast Paced
-    ##   North-East          0
-    ##   North-West          0
-    ##   South-East          0
-    ##   South-West          0
-    ##             
-    ##              Hyper Paced
-    ##   North-East           0
-    ##   North-West           0
-    ##   South-East           0
-    ##   South-West           0
-    ##             
-    ##              Medium Paced
-    ##   North-East           60
-    ##   North-West           53
-    ##   South-East           72
-    ##   South-West           65
+    ##              Fast Paced Hyper Paced Medium Paced
+    ##   North-East          0           0           60
+    ##   North-West          0           0           53
+    ##   South-East          0           0           72
+    ##   South-West          0           0           65
     ##             
     ##              Slow Paced
     ##   North-East          0
@@ -747,23 +740,11 @@ print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
     ## , ,  = O
     ## 
     ##             
-    ##              Fast Paced
-    ##   North-East          8
-    ##   North-West          8
-    ##   South-East         12
-    ##   South-West          9
-    ##             
-    ##              Hyper Paced
-    ##   North-East           0
-    ##   North-West           0
-    ##   South-East           0
-    ##   South-West           0
-    ##             
-    ##              Medium Paced
-    ##   North-East            0
-    ##   North-West            0
-    ##   South-East            0
-    ##   South-West            0
+    ##              Fast Paced Hyper Paced Medium Paced
+    ##   North-East          8           0            0
+    ##   North-West          8           0            0
+    ##   South-East         12           0            0
+    ##   South-West          9           0            0
     ##             
     ##              Slow Paced
     ##   North-East          0
@@ -774,23 +755,11 @@ print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
     ## , ,  = R
     ## 
     ##             
-    ##              Fast Paced
-    ##   North-East          0
-    ##   North-West          0
-    ##   South-East          0
-    ##   South-West          0
-    ##             
-    ##              Hyper Paced
-    ##   North-East           0
-    ##   North-West           2
-    ##   South-East           0
-    ##   South-West           0
-    ##             
-    ##              Medium Paced
-    ##   North-East            0
-    ##   North-West            0
-    ##   South-East            0
-    ##   South-West            0
+    ##              Fast Paced Hyper Paced Medium Paced
+    ##   North-East          0           0            0
+    ##   North-West          0           2            0
+    ##   South-East          0           0            0
+    ##   South-West          0           0            0
     ##             
     ##              Slow Paced
     ##   North-East          0
@@ -801,23 +770,11 @@ print(table(cmeSampleData$zone, cmeSampleData$speedC, cmeSampleData$type))
     ## , ,  = S
     ## 
     ##             
-    ##              Fast Paced
-    ##   North-East          0
-    ##   North-West          0
-    ##   South-East          0
-    ##   South-West          0
-    ##             
-    ##              Hyper Paced
-    ##   North-East           0
-    ##   North-West           0
-    ##   South-East           0
-    ##   South-West           0
-    ##             
-    ##              Medium Paced
-    ##   North-East            0
-    ##   North-West            0
-    ##   South-East            0
-    ##   South-West            0
+    ##              Fast Paced Hyper Paced Medium Paced
+    ##   North-East          0           0            0
+    ##   North-West          0           0            0
+    ##   South-East          0           0            0
+    ##   South-West          0           0            0
     ##             
     ##              Slow Paced
     ##   North-East        181
@@ -846,20 +803,17 @@ knitr::kable(table(cmeSampleData$zone, cmeSampleData$speedC))
 | South-West |          9 |           0 |           65 |        154 |
 
 To further see the statistics about the CME events in each zone, I have
-plotted the following The 4 different colors represent 4 different
-zones, the shape of each event represents the type of the event, and the
-size of each events represents the speed of ejection during the CME
-event (Sun’s surface to event locations is not to scale and is only for
-representation purposes).
+plotted the following:  
+The 4 different colors represent 4 different zones, the shape of each
+event represents the type of the event, and the size of each events
+represents the speed of ejection during the CME event (Sun’s surface to
+event locations is not to scale and is only for representation
+purposes).
 
 ``` r
-#img <- readJPEG("img\\sun2.jpeg")
-
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
     geom_point(aes(color = zone, size = speedC, shape = type)) +
-    #scale_shape_discrete(name = "Type", labels = c("S", "C")) +
-    #scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
     scale_size_discrete(name = "speed", labels = c(speedClassfication[1], speedClassfication[2], speedClassfication[3], speedClassfication[4])) + 
     ylim(-180,180) +
     xlim(-90, 90) +
@@ -906,7 +860,7 @@ ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
   geom_smooth(method = "lm",color="black") + 
   labs(title="Scatter Plot showing relation between speed and half angle of the CME event",
         x ="Half Angle", y = "Speed") + 
-  annotate(geom="text", x=10, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
+  annotate(geom="text", x=20, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
 ```
 
 ![](README_files/figure-gfm/cor-1.png)<!-- -->
