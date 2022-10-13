@@ -442,7 +442,9 @@ cmeSampleData2 <- apiSelection("Coronal Mass Ejection (CME) Analysis", "2017-01-
 cmeSampleData <- rbind(cmeSampleData, cmeSampleData2)
 
 print(cmeSampleData)
+```
 
+```{r}
 knitr::kable(summary(cmeSampleData %>% select(halfAngle, speed, latitude, longitude)))
 ```
 
@@ -543,16 +545,14 @@ knitr::kable(table(cmeSampleData$zone, cmeSampleData$speedC))
 ```
 
 
-To further see the statistics about the CME events in each zone, I have plotted the following  The 4 different colors represent 4 different zones, the shape of each event represents the type of the event, and the size of each events represents the speed of ejection during the CME event (Sun's surface to event locations is not to scale and is only for representation purposes).
+To further see the statistics about the CME events in each zone, I have plotted the following:  
+The 4 different colors represent 4 different zones, the shape of each event represents the type of the event, and the size of each events represents the speed of ejection during the CME event (Sun's surface to event locations is not to scale and is only for representation purposes).
 
 ```{r cme_con_tbls, message=FALSE, warning=FALSE, fig.width= 7.5 , fig.height=6}
-#img <- readJPEG("img\\sun2.jpeg")
 
 ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
     background_image(img) +
     geom_point(aes(color = zone, size = speedC, shape = type)) +
-    #scale_shape_discrete(name = "Type", labels = c("S", "C")) +
-    #scale_color_manual(values = c("C" = "#37a0bf", "S" = "green")) +
     scale_size_discrete(name = "speed", labels = c(speedClassfication[1], speedClassfication[2], speedClassfication[3], speedClassfication[4])) + 
     ylim(-180,180) +
     xlim(-90, 90) +
@@ -582,7 +582,6 @@ From the plot above, we can see the statistics of each zone. It seems that most 
 Here this suggests that as the average half angle increase, average speed also increases. To check that,a scatter plot between speed and half angle is also shown to visualize correlation between the two variables. A linear model regression line is also fitted with the help of geom_smooth function.
 
 ```{r cor, message=FALSE, warning=FALSE}
-
 cor <- cor(cmeSampleData$halfAngle, cmeSampleData$speed)
 
 ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
@@ -590,7 +589,7 @@ ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
   geom_smooth(method = "lm",color="black") + 
   labs(title="Scatter Plot showing relation between speed and half angle of the CME event",
         x ="Half Angle", y = "Speed") + 
-  annotate(geom="text", x=10, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
+  annotate(geom="text", x=20, y=2000, label=paste0("Correlation between \nSpeed and Half angle = ", round(cor, 3)))
 
 ```
 
