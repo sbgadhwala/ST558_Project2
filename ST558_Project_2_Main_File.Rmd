@@ -355,7 +355,7 @@ plot1 + geom_point(aes(color = Is_Potentially_Hazardous_Asteroid, size = Maximum
       subtitle = "Miss Distance For Date Range")
 
 ```
-In th point plot, I have tried to visualize the count for Miss Distance for a give n date range with diameter as a size and if that particular asteroid is hazardous or not. Few key finding from the plots:  
+In the scatter plot, I have tried to visualize the count for Miss Distance for a give n date range with diameter as a size and if that particular asteroid is hazardous or not. Few key finding from the plots:  
 1. Most of the asteroids are categorized as a non hazardous for a given date range  
 2. All bigger asteroid (large diameter) are in upper part of the plot  
 
@@ -377,11 +377,11 @@ plot2 +
 
 ```
 
-The dark line in box plot represent the median and the top box is 75%ile and bottom box is 25 %ile. The end points of the black line are whiskers and they are at a distance of 1.5*IQR. In this plot we can visualize that the median diameter of potentially hazardous asteroid is hgher than the non hazardous asteroid. From the plot, we can also visualize few extreme points (>1.5IQR).  
+The dark line in box plot represent the median and the top box is 75 %ile and bottom box is 25 %ile. The end points of the black line are whiskers and they are at a distance of 1.5*IQR. In this plot we can visualize that the median diameter of potentially hazardous asteroid is higher than the non hazardous asteroid. From the plot, we can also visualize few extreme points (>1.5IQR).  
 
-```{r, fig.width= 9 , fig.height=10, message  =FALSE, warning=FALSE}
+```{r, fig.width= 6 , fig.height=6, message  =FALSE, warning=FALSE}
 
-
+numericalDf <- astDf[, c(1,2,3,4,6)]
 
 corr <- cor(numericalDf, method = "spearman")
 
@@ -390,8 +390,9 @@ corrplot(corr, hc.order = TRUE,
            type = "lower", 
            tl.pos = "lt",
          title = "Correlation Plot",
-         subtitle = "Correlation Coefficient for Asteroid Data"
-)
+         subtitle = "Correlation Coefficient for Asteroid Data",
+         mar=c(0,0,2,0)
+         )
 
 
 ```
@@ -557,7 +558,7 @@ ggplot(cmeSampleData, aes(x=latitude, y=longitude)) +
 
 ```
 
-A correlation plot between speed and half angle is also shown. A linear model regression line is also fitted with the help of geom_smooth function.
+A scatter plot between speed and half angle is also shown to visualize correlation between the two variables. A linear model regression line is also fitted with the help of geom_smooth function.
 
 ```{r cor, message=FALSE, warning=FALSE}
 
@@ -572,7 +573,6 @@ ggplot(cmeSampleData, aes(x=halfAngle, y=speed)) +
 
 ```
   
-  
 Then for each zone, I have plotted the bar plots representing count of CME events that are classified by their half angle values.
 ```{r barplot, fig.width= 9 , fig.height=6}
 ggplot(cmeSampleData, aes(x = type)) + 
@@ -584,7 +584,7 @@ ggplot(cmeSampleData, aes(x = type)) +
 
 ```
 
-Lastly, I took the dates (time-stamp) of events, and extracted months and years from them, and plotted a histogram the count of CME events occurring in each month, and in each year between the given input start and end dates, classified into the type of events on the histograms bins.
+Lastly, I took the dates (time-stamp) of events, and extracted months and years from them, and plotted histograms for the count of CME events occurring in each month, and each year between the given input start and end dates, classified into the type of events on the histograms bins.
 
 ```{r hist, message=FALSE, warning=FALSE}
 dates = c()
@@ -642,3 +642,4 @@ Coronal Mass Ejection (CME) Analysis helps get the data of coronal mass ejection
 In similar fashion asteroid API helps in retrieving data pertaining to near earth objects like asteroid and comets. Following up on the date retrieved after the API call, we have done the Exploratory Data Analysis to get some hidden and valuable insights from the data.
 
 
+Hope the functions build for this vignette helps for the NASA APIs!
